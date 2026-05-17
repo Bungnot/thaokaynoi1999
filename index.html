@@ -342,6 +342,55 @@ body::before{background:radial-gradient(ellipse at 20% 8%,var(--neon-dim),transp
 @media (max-width:1180px){.stats-row{grid-template-columns:repeat(2,1fr)}.g3{grid-template-columns:1fr}.g2{grid-template-columns:1fr}.content{padding:1rem}}
 @media (max-width:860px){:root{--topbar-h:auto}.topbar{position:relative;flex-wrap:wrap;height:auto;padding:.8rem}.tb-spacer{display:none}.main-wrap{display:block}.sidebar{position:relative;top:0;width:100%;height:auto;min-height:0;display:flex;overflow-x:auto;gap:.3rem;padding:.65rem}.sidebar::before,.nav-sec{display:none}.nav-btn{white-space:nowrap;width:auto;min-width:max-content}.content{padding:.8rem}.stats-row{grid-template-columns:1fr}.dashboard-hero{flex-direction:column;align-items:flex-start}.hero-actions{justify-content:flex-start}.sbox{max-width:none}.toolbar{align-items:stretch}.theme-picker{margin-left:auto}}
 
+
+
+/* CURRENT ROUND BOARD */
+.panel-current-round{background:transparent;border:none;box-shadow:none;overflow:visible}
+.panel-current-round>.phdr{display:none}
+.panel-current-round>.pbody{padding:0!important}
+.current-round-board{background:linear-gradient(180deg,rgba(23,35,62,.96),rgba(10,18,36,.98));border:1px solid var(--border2);border-radius:18px;overflow:hidden;box-shadow:0 18px 42px rgba(0,0,0,.26)}
+.current-round-head{display:flex;align-items:center;justify-content:space-between;gap:.65rem;padding:.95rem 1rem;border-bottom:1px solid rgba(255,255,255,.055);background:linear-gradient(180deg,rgba(255,255,255,.035),rgba(255,255,255,.01))}
+.current-round-title{display:flex;align-items:center;gap:.55rem;font-size:.95rem;font-weight:800;color:var(--text)}
+.current-round-title .ico{font-size:1rem}
+.current-round-pill{display:inline-flex;align-items:center;gap:.35rem;padding:.28rem .72rem;border-radius:999px;font-size:.68rem;font-weight:800;border:1px solid rgba(0,255,136,.28);background:var(--neon-dim);color:var(--neon);white-space:nowrap}
+.current-round-body{padding:1rem}
+.cr-grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:.85rem;margin-bottom:.85rem}
+.cr-card{background:rgba(255,255,255,.028);border:1px solid rgba(255,255,255,.06);border-radius:14px;padding:.85rem .95rem;min-height:74px;display:flex;flex-direction:column;justify-content:center}
+.cr-label{font-size:.72rem;color:var(--text2);margin-bottom:.2rem;text-align:center}
+.cr-value{font-size:1.35rem;font-weight:900;color:var(--text);line-height:1.1;text-align:center}
+.cr-value.ok{color:var(--neon)}
+.cr-value.warn{color:var(--yellow)}
+.cr-value.info{color:var(--blue)}
+.cr-value.mono{font-family:'JetBrains Mono',monospace}
+.cr-camp{font-size:1.15rem;color:#86c8ff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cr-wide{display:flex;justify-content:center;align-items:center;gap:1.25rem;text-align:center;margin-bottom:.85rem}
+.cr-wide .mid{opacity:.58;font-size:1.1rem;font-weight:800;color:var(--text2)}
+.cr-announce{padding:1rem .8rem .85rem;text-align:center}
+.cr-announce .a-label{font-size:.72rem;color:var(--text2)}
+.cr-announce .a-value{margin-top:.2rem;font-size:2.1rem;font-weight:950;line-height:1;color:var(--neon);display:inline-flex;align-items:center;gap:.5rem;font-family:'JetBrains Mono',monospace}
+.cr-divider{height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.12),transparent);margin:.2rem 0 .75rem}
+.cr-stats-title{display:flex;align-items:center;gap:.65rem;color:var(--text2);font-size:.73rem;margin-bottom:.7rem}
+.cr-stats-title::after{content:'';height:1px;flex:1;background:rgba(255,255,255,.08)}
+.cr-stats{display:grid;grid-template-columns:1fr 1fr;gap:.8rem}
+.cr-stat{border-radius:14px;padding:1rem .8rem;border:1px solid rgba(255,255,255,.08);text-align:center;background:rgba(255,255,255,.03)}
+.cr-stat .n{font-size:2rem;font-weight:950;line-height:1.05;font-family:'JetBrains Mono',monospace}
+.cr-stat .t{font-size:.76rem;color:var(--text2);margin-top:.3rem}
+.cr-stat.done{background:rgba(0,255,136,.12);border-color:rgba(0,255,136,.28)}
+.cr-stat.done .n{color:var(--neon)}
+.cr-stat.wait{background:rgba(255,215,0,.08);border-color:rgba(255,215,0,.20)}
+.cr-stat.wait .n{color:var(--yellow)}
+.cr-stat.pending{background:rgba(0,180,255,.09);border-color:rgba(0,180,255,.20)}
+.cr-stat.pending .n{color:var(--blue)}
+.cr-stat.cancel{background:rgba(255,255,255,.03);border-color:rgba(255,255,255,.08)}
+.cr-stat.cancel .n{color:#9aa8bc}
+.cr-mini-list{display:grid;grid-template-columns:1fr;gap:.55rem;margin-top:.85rem}
+.cr-mini{display:flex;align-items:center;gap:.65rem;padding:.68rem .8rem;background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.06);border-radius:12px;cursor:pointer;transition:all .15s}
+.cr-mini:hover{transform:translateY(-1px);border-color:rgba(0,255,136,.22)}
+.cr-mini .name{font-weight:800;color:var(--text)}
+.cr-mini .sub{font-size:.68rem;color:var(--text3)}
+.cr-mini .amt{margin-left:auto;font-weight:900;font-family:'JetBrains Mono',monospace;color:var(--yellow)}
+@media (max-width:900px){.cr-grid3,.cr-stats{grid-template-columns:1fr}.cr-wide{gap:.75rem}}
+
 </style>
 </head>
 <body>
@@ -456,7 +505,7 @@ body::before{background:radial-gradient(ellipse at 20% 8%,var(--neon-dim),transp
             <div class="phdr"><span>👤</span><h3>สมาชิก ACTIVE</h3><span class="tag tg" id="active-tag">— ออนไลน์</span></div>
             <div class="pbody" style="padding:.5rem .75rem"><div id="top5"><div class="loading"><div class="spin"></div></div></div></div>
           </div>
-          <div class="panel">
+          <div class="panel panel-current-round">
             <div class="phdr"><span>⚡</span><h3>สถานะรอบปัจจุบัน</h3><button class="tag tg" style="cursor:pointer;border:none;font-size:.62rem;font-weight:700;padding:.12rem .45rem;border-radius:20px;background:var(--neon-dim);color:var(--neon)" onclick="loadRounds()">แจ้งผลสด</button></div>
             <div class="pbody" id="ov-rounds"><div class="loading"><div class="spin"></div></div></div>
           </div>
@@ -829,13 +878,69 @@ async function loadOverview(){
   try{
     const [pr,rr]=await Promise.all([api('/dashboard/api/profit'),api('/dashboard/api/rounds')]);
     if(pr.ok){const p=pr.data;$('s-profit').textContent=fmt(p.total_profit);$('ov-profit').textContent=fmt(p.total_profit);$('ov-profit-rounds').textContent=fmt((p.rounds||[]).length)+' รอบ';const rds=(p.rounds||[]).slice(0,50).reverse();drawOvChart(rds);renderOvBets(rds);}
-    if(rr.ok){const open=(rr.data||[]).filter(x=>x.opened&&!x.settled);$('s-rounds').textContent=fmt((rr.data||[]).length);$('s-open').textContent='รอปิด/ยืนยัน: '+fmt(open.length);renderOvRounds(open.slice(0,4));}
+    if(rr.ok){const open=(rr.data||[]).filter(x=>x.opened&&!x.settled);$('s-rounds').textContent=fmt((rr.data||[]).length);$('s-open').textContent='รอปิด/ยืนยัน: '+fmt(open.length);renderOvRounds(getCurrentRounds(rr.data||[]));}
   }catch(e){console.error(e)}
 }
 function renderTop5(list){const rc=['r1','r2','r3','rn','rn'];$('top5').innerHTML=list.map((u,i)=>`<div class="mrow"><div class="mrank ${rc[i]||'rn'}">${i+1}</div>${avatarHtml(u,i,'24px')}<div class="minfo"><div class="mname">${esc(u.name||u.user_id)}</div><div class="mid_">${(u.user_id||'').substring(0,12)}...</div></div><div style="text-align:right"><div class="${(u.credit||0)===0?'mcredit0':'mcredit'}">${fmt(u.credit||0)}</div><div style="font-size:.6rem;color:var(--text3)">เครดิต</div></div></div>`).join('')}
+function roundPick(obj,keys,fb='—'){for(const k of keys){if(obj&&obj[k]!==undefined&&obj[k]!==null&&obj[k]!=='')return obj[k]}return fb}
+function roundNum(obj,keys,fb=0){for(const k of keys){const v=obj&&obj[k];if(v!==undefined&&v!==null&&v!==''&&!Number.isNaN(Number(v)))return Number(v)}return fb}
+function getCurrentRounds(list){
+  const rounds=list||[];
+  const open=rounds.filter(x=>x.opened&&!x.settled);
+  return (open.length?open:rounds).slice(0,4);
+}
+function roundStateText(r){
+  const st=roundPick(r,['status'],'');
+  if(r.settled||st==='settled'||st==='result')return 'แจ้งผลแล้ว';
+  if(r.opened||st==='open')return 'เปิดรับ';
+  return 'รอเปิดรอบ';
+}
+function roundResultText(r){return roundPick(r,['announced_result','winner','result','outcome','answer'],'-')}
 function renderOvRounds(rounds){
   if(!rounds.length){$('ov-rounds').innerHTML='<div class="empty">ไม่มีรอบที่เปิดอยู่</div>';return}
-  $('ov-rounds').innerHTML=rounds.map(r=>`<div class="rmini open" onclick="openRoundDet('${esc(r.round_id||r.base_no)}','${esc(r.camp_name||r.base_no)}')"><div class="rmini-top"><span class="rname">${esc(r.camp_name||r.base_no)}</span><span class="badge bg_">● เปิดอยู่</span></div><div class="rstats"><span>ค่าย <span class="rv">${esc(r.camp_name||'-')}</span></span><span>คู่ <span class="rv">${fmt(r.match_count||0)}</span></span><span>ยอด <span class="rv" style="color:var(--yellow)">${fmt(r.total_amount||0)}</span></span></div></div>`).join('');
+  const main=rounds[0], others=rounds.slice(1);
+  const camp=roundPick(main,['display_name','camp_name','base_no','name'],'-');
+  const status=roundStateText(main);
+  const result=roundResultText(main);
+  const lowRate=roundPick(main,['maker_rate','maker_price','maker_odds','rate_low','price_low','low_rate'],'—');
+  const highRate=roundPick(main,['taker_rate','taker_price','taker_odds','rate_high','price_high','high_rate'],'—');
+  const done=roundNum(main,['matched_count','confirmed_count','done_count','processed_count'], roundNum(main,['match_count'],0));
+  const waitConfirm=roundNum(main,['pending_count','confirming_count','waiting_confirm_count'],0);
+  const waitSettle=roundNum(main,['waiting_count','unsettled_count','waiting_result_count'],0);
+  const cancelled=roundNum(main,['cancelled_count','canceled_count','void_count'],0);
+  const announced=roundPick(main,['announced_result','winner','result','outcome'],'-');
+  $('ov-rounds').innerHTML=`
+    <div class="current-round-board" onclick="openRoundDet('${esc(main.round_id||main.base_no)}','${esc(main.camp_name||main.base_no)}')">
+      <div class="current-round-head">
+        <div class="current-round-title"><span class="ico">🎮</span><span>สถานะรอบปัจจุบัน</span></div>
+        <span class="current-round-pill">${main.settled?'ประกาศผลแล้ว':'แจ้งผลสด'}</span>
+      </div>
+      <div class="current-round-body">
+        <div class="cr-grid3">
+          <div class="cr-card"><div class="cr-label">ค่าย</div><div class="cr-value cr-camp">${esc(camp)}</div></div>
+          <div class="cr-card"><div class="cr-label">สถานะ</div><div class="cr-value ok">${status==='แจ้งผลแล้ว'?'✅ ':status==='เปิดรับ'?'🟢 ':''}${esc(status)}</div></div>
+          <div class="cr-card"><div class="cr-label">ผลออก</div><div class="cr-value warn mono">${esc(result)}</div></div>
+        </div>
+        <div class="cr-card cr-wide">
+          <div><div class="cr-label">ราคาจ่าย (ต่ำ)</div><div class="cr-value warn mono">${esc(lowRate)}</div></div>
+          <div class="mid">–</div>
+          <div><div class="cr-label">ราคาจ่าย (สูง)</div><div class="cr-value warn mono">${esc(highRate)}</div></div>
+        </div>
+        <div class="cr-announce">
+          <div class="a-label">ผลออก (Announced)</div>
+          <div class="a-value">${esc(announced)} <span style="font-size:1.2rem;font-family:'Sarabun',sans-serif">🎯</span></div>
+        </div>
+        <div class="cr-divider"></div>
+        <div class="cr-stats-title">สถิติผล</div>
+        <div class="cr-stats">
+          <div class="cr-stat done"><div class="n">${fmt(done)}</div><div class="t">ติดผลแล้ว</div></div>
+          <div class="cr-stat wait"><div class="n">${fmt(waitConfirm)}</div><div class="t">รอยืนยัน</div></div>
+          <div class="cr-stat pending"><div class="n">${fmt(waitSettle)}</div><div class="t">รอคิดผล</div></div>
+          <div class="cr-stat cancel"><div class="n">${fmt(cancelled)}</div><div class="t">ยกเลิก</div></div>
+        </div>
+        ${others.length?`<div class="cr-mini-list">${others.map(r=>`<div class="cr-mini" onclick="event.stopPropagation();openRoundDet('${esc(r.round_id||r.base_no)}','${esc(r.camp_name||r.base_no)}')"><div><div class="name">${esc(roundPick(r,['display_name','camp_name','base_no','name'],'-'))}</div><div class="sub">${esc(roundStateText(r))} • ${fmt(roundNum(r,['match_count'],0))} คู่</div></div><div class="amt">${fmt(roundNum(r,['total_amount'],0))}</div></div>`).join('')}</div>`:''}
+      </div>
+    </div>`;
 }
 function renderOvBets(rounds){const last3=rounds.slice(-3).reverse();$('ov-bets').innerHTML=last3.length?last3.map(r=>`<div style="display:flex;align-items:center;gap:.55rem;padding:.45rem 0;border-bottom:1px solid var(--border)"><div style="flex:1;min-width:0"><div style="font-size:.78rem;font-weight:600">${esc(r.camp_name||r.round_id||'-')}</div><div style="font-size:.65rem;color:var(--text3)">รอบ: ${(r.round_id||'-').substring(0,8)}...</div></div><span class="badge bg_">ปิดแล้ว</span><div style="text-align:right"><div style="font-family:'JetBrains Mono',monospace;font-size:.82rem;font-weight:700;color:var(--yellow)">${fmt(r.profit||0)}</div><div style="font-size:.6rem;color:var(--text3)">กำไร</div></div></div>`).join(''):'<div class="empty">ไม่มีข้อมูล</div>'}
 function drawOvChart(rounds){
@@ -888,7 +993,7 @@ function delUser(uid,name,credit){if(!confirm(`ลบสมาชิก "${name|
 // ========== ROUNDS ==========
 async function loadRounds(){
   $('r-tbody').innerHTML='<tr><td colspan="7"><div class="loading"><div class="spin"></div></div></td></tr>';
-  try{const d=await api('/dashboard/api/rounds');allRounds=d.data||[];renderOvRounds((allRounds).filter(x=>x.opened&&!x.settled).slice(0,4));renderRoundsTable();}
+  try{const d=await api('/dashboard/api/rounds');allRounds=d.data||[];renderOvRounds(getCurrentRounds(allRounds));renderRoundsTable();}
   catch{$('r-tbody').innerHTML='<tr><td colspan="7"><div class="empty">โหลดไม่ได้</div></td></tr>'}
 }
 function setRF(f){rf=f;['all','open','settled'].forEach(x=>{const b=$('rf-'+x);if(b)b.className='btn '+(x===f?'bng':'bgh')});renderRoundsTable()}
