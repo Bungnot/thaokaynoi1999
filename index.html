@@ -391,35 +391,6 @@ body::before{background:radial-gradient(ellipse at 20% 8%,var(--neon-dim),transp
 .cr-mini .amt{margin-left:auto;font-weight:900;font-family:'JetBrains Mono',monospace;color:var(--yellow)}
 @media (max-width:900px){.cr-grid3,.cr-stats{grid-template-columns:1fr}.cr-wide{gap:.75rem}}
 
-
-/* MATCH PAIR MODAL */
-.match-summary{display:flex;align-items:center;gap:.55rem;margin-bottom:.75rem;padding:.6rem .75rem;border:1px solid var(--border);border-radius:12px;background:var(--bg3);color:var(--text2);font-size:.76rem}
-.match-summary strong{color:var(--text)}
-.match-list{display:flex;flex-direction:column;gap:.7rem}
-.match-card{background:linear-gradient(180deg,rgba(255,255,255,.035),rgba(255,255,255,.015));border:1px solid var(--border);border-radius:14px;padding:.78rem;overflow:hidden}
-.match-card-top{display:flex;align-items:center;gap:.5rem;margin-bottom:.68rem}
-.match-no{display:inline-flex;align-items:center;justify-content:center;min-width:34px;height:24px;padding:0 .45rem;border-radius:999px;background:var(--blue-dim);border:1px solid #00b4ff33;color:var(--blue);font-family:'JetBrains Mono',monospace;font-size:.68rem;font-weight:800}
-.match-time{margin-left:auto;color:var(--text3);font-size:.66rem}
-.match-vs{display:grid;grid-template-columns:1fr auto 1fr;gap:.62rem;align-items:stretch}
-.player-box{background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:.68rem .7rem;min-width:0}
-.player-role{font-size:.62rem;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:.18rem}
-.player-name{font-size:.86rem;font-weight:800;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:.38rem}
-.play-text{display:inline-flex;align-items:center;justify-content:center;max-width:100%;padding:.22rem .62rem;border-radius:999px;background:var(--neon-dim);border:1px solid var(--neon-border);color:var(--neon);font-size:.92rem;font-weight:950;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:.38rem}
-.play-caption{font-size:.62rem;color:var(--text3);margin-top:-.18rem;margin-bottom:.32rem}
-.play-line{width:100%;display:flex;align-items:center;gap:.42rem;flex-wrap:wrap;margin-top:.35rem;padding:.55rem .65rem;border-radius:12px;background:var(--bg3);border:1px solid var(--border);color:var(--text);line-height:1.55}
-.play-line .who{font-weight:900;color:var(--neon)}
-.play-line .cmd{display:inline-flex;align-items:center;padding:.14rem .5rem;border-radius:999px;background:var(--neon-dim);border:1px solid var(--neon-border);color:var(--neon);font-weight:950}
-.vs-dot{display:flex;align-items:center;justify-content:center;color:var(--text2);font-size:.72rem;font-weight:900}
-.side-badge{display:inline-flex;align-items:center;justify-content:center;min-width:46px;padding:.14rem .5rem;border-radius:999px;font-size:.68rem;font-weight:900;border:1px solid}
-.side-badge.hi{background:var(--red-dim);color:var(--red);border-color:#ff444433}
-.side-badge.lo{background:var(--blue-dim);color:var(--blue);border-color:#00b4ff33}
-.side-badge.mid{background:var(--bg4);color:var(--text2);border-color:var(--border2)}
-.match-foot{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;margin-top:.68rem;padding-top:.62rem;border-top:1px solid var(--border);font-size:.72rem;color:var(--text2)}
-.match-amount{font-family:'JetBrains Mono',monospace;font-weight:900;color:var(--yellow)}
-.match-sentence{width:100%;margin-top:.3rem;color:var(--text);line-height:1.45}
-.match-sentence strong{color:var(--neon)}
-@media (max-width:620px){.match-vs{grid-template-columns:1fr}.vs-dot{height:14px}.match-time{display:none}}
-
 </style>
 </head>
 <body>
@@ -918,7 +889,6 @@ function getCurrentRounds(list){
   const open=rounds.filter(x=>x.opened&&!x.settled);
   return (open.length?open:rounds).slice(0,4);
 }
-function getRoundId(r){return roundPick(r,['round_id','roundId','id','base_no','baseNo','round_no','roundNo'],'-')}
 function roundStateText(r){
   const st=roundPick(r,['status'],'');
   if(r.settled||st==='settled'||st==='result')return 'แจ้งผลแล้ว';
@@ -940,7 +910,7 @@ function renderOvRounds(rounds){
   const cancelled=roundNum(main,['cancelled_count','canceled_count','void_count'],0);
   const announced=roundPick(main,['announced_result','winner','result','outcome'],'-');
   $('ov-rounds').innerHTML=`
-    <div class="current-round-board" onclick="openRoundDet('${esc(getRoundId(main))}','${esc(camp)}')">
+    <div class="current-round-board" onclick="openRoundDet('${esc(main.round_id||main.base_no)}','${esc(main.camp_name||main.base_no)}')">
       <div class="current-round-head">
         <div class="current-round-title"><span class="ico">🎮</span><span>สถานะรอบปัจจุบัน</span></div>
         <span class="current-round-pill">${main.settled?'ประกาศผลแล้ว':'แจ้งผลสด'}</span>
@@ -968,7 +938,7 @@ function renderOvRounds(rounds){
           <div class="cr-stat pending"><div class="n">${fmt(waitSettle)}</div><div class="t">รอคิดผล</div></div>
           <div class="cr-stat cancel"><div class="n">${fmt(cancelled)}</div><div class="t">ยกเลิก</div></div>
         </div>
-        ${others.length?`<div class="cr-mini-list">${others.map(r=>`<div class="cr-mini" onclick="event.stopPropagation();openRoundDet('${esc(getRoundId(r))}','${esc(roundPick(r,['display_name','camp_name','base_no','name'],'-'))}')"><div><div class="name">${esc(roundPick(r,['display_name','camp_name','base_no','name'],'-'))}</div><div class="sub">${esc(roundStateText(r))} • ${fmt(roundNum(r,['match_count'],0))} คู่</div></div><div class="amt">${fmt(roundNum(r,['total_amount'],0))}</div></div>`).join('')}</div>`:''}
+        ${others.length?`<div class="cr-mini-list">${others.map(r=>`<div class="cr-mini" onclick="event.stopPropagation();openRoundDet('${esc(r.round_id||r.base_no)}','${esc(r.camp_name||r.base_no)}')"><div><div class="name">${esc(roundPick(r,['display_name','camp_name','base_no','name'],'-'))}</div><div class="sub">${esc(roundStateText(r))} • ${fmt(roundNum(r,['match_count'],0))} คู่</div></div><div class="amt">${fmt(roundNum(r,['total_amount'],0))}</div></div>`).join('')}</div>`:''}
       </div>
     </div>`;
 }
@@ -1032,153 +1002,9 @@ function renderRoundsTable(){
   if(rf==='open')data=data.filter(r=>r.opened&&!r.settled);
   if(rf==='settled')data=data.filter(r=>r.settled);
   if(!data.length){$('r-tbody').innerHTML='<tr><td colspan="7"><div class="empty">ไม่พบรอบ</div></td></tr>';return}
-  $('r-tbody').innerHTML=data.map(r=>{const io=r.opened&&!r.settled;return`<tr><td><div style="font-weight:600">${esc(r.camp_name||r.base_no)}</div><div class="mono" style="color:var(--text3)">${r.base_no}</div></td><td>${io?'<span class="badge bg_">● เปิดอยู่</span>':'<span class="badge bgr">○ ปิดแล้ว</span>'}</td><td class="mono">${fmt(r.match_count||0)}</td><td style="font-family:'JetBrains Mono',monospace;color:var(--yellow)">${fmt(r.total_amount||0)}</td><td>${r.winner?`<span class="badge bg_">${esc(r.winner)}</span>`:'<span style="color:var(--text3)">-</span>'}</td><td style="font-size:.7rem;color:var(--text3)">${fmtD(r.opened_at)}</td><td><button class="abtn" onclick="openRoundDet('${esc(getRoundId(r))}','${esc(roundPick(r,['display_name','camp_name','base_no','name'],'-'))}')">ดูคู่</button></td></tr>`}).join('');
+  $('r-tbody').innerHTML=data.map(r=>{const io=r.opened&&!r.settled;return`<tr><td><div style="font-weight:600">${esc(r.camp_name||r.base_no)}</div><div class="mono" style="color:var(--text3)">${r.base_no}</div></td><td>${io?'<span class="badge bg_">● เปิดอยู่</span>':'<span class="badge bgr">○ ปิดแล้ว</span>'}</td><td class="mono">${fmt(r.match_count||0)}</td><td style="font-family:'JetBrains Mono',monospace;color:var(--yellow)">${fmt(r.total_amount||0)}</td><td>${r.winner?`<span class="badge bg_">${esc(r.winner)}</span>`:'<span style="color:var(--text3)">-</span>'}</td><td style="font-size:.7rem;color:var(--text3)">${fmtD(r.opened_at)}</td><td><button class="abtn" onclick="openRoundDet('${esc(r.round_id||r.base_no)}','${esc(r.camp_name||r.base_no)}')">ดูคู่</button></td></tr>`}).join('');
 }
-function pick(obj,keys,fb='-'){for(const k of keys){if(obj&&obj[k]!==undefined&&obj[k]!==null&&obj[k]!=='')return obj[k]}return fb}
-
-function getPath(obj,path){
-  try{return String(path).split('.').reduce((o,k)=>o&&o[k]!==undefined?o[k]:undefined,obj)}catch{return undefined}
-}
-function pickDeep(obj,keys,fb=''){
-  for(const k of keys){
-    const v=String(k).includes('.')?getPath(obj,k):(obj?obj[k]:undefined);
-    if(v!==undefined&&v!==null&&String(v).trim()!=='')return v;
-  }
-  return fb;
-}
-function sideShort(v){const s=sideThai(v);if(s==='สูง')return 'ส';if(s==='ต่ำ')return 'ต';return v&&v!=='-'?String(v):'-'}
-function playText(m,role,amount,roundName=''){
-  const makerKeys=[
-    'maker_play_text','makerPlayText','maker_text','makerText','maker_message','makerMessage','maker_message_text','makerMessageText',
-    'maker_command','makerCommand','maker_cmd','makerCmd','maker_order_text','makerOrderText','maker_raw_text','makerRawText',
-    'maker_input','makerInput','maker_bet_text','makerBetText','maker_display_text','makerDisplayText','maker.line_text','maker.text','maker.message.text',
-    'a_text','aText','player_a_text','playerAText','source_text','sourceText','original_text','originalText','quoted_text','quotedText','quoted_message_text','quotedMessageText'
-  ];
-  const takerKeys=[
-    'taker_play_text','takerPlayText','taker_text','takerText','taker_message','takerMessage','taker_message_text','takerMessageText',
-    'taker_command','takerCommand','taker_cmd','takerCmd','taker_order_text','takerOrderText','taker_raw_text','takerRawText',
-    'taker_input','takerInput','taker_bet_text','takerBetText','taker_display_text','takerDisplayText','taker.line_text','taker.text','taker.message.text',
-    'b_text','bText','player_b_text','playerBText','reply_text','replyText','reply_message_text','replyMessageText'
-  ];
-  const raw=String(pickDeep(m,role==='maker'?makerKeys:takerKeys,'')).trim();
-  if(raw)return raw;
-  const rolePrefix=String(pickDeep(m,role==='maker'
-    ? ['maker_prefix','makerPrefix','maker_camp','makerCamp','maker_team','makerTeam','maker_base','makerBase','maker_choice_label','makerChoiceLabel']
-    : ['taker_prefix','takerPrefix','taker_camp','takerCamp','taker_team','takerTeam','taker_base','takerBase','taker_choice_label','takerChoiceLabel'],''
-  )).trim();
-  if(rolePrefix&&amount)return `${rolePrefix}${fmt(amount)}`.replace(/,/g,'');
-  if(role==='maker'&&roundName&&roundName!=='-'&&amount)return `${roundName}${fmt(amount)}`.replace(/,/g,'');
-  return sideShort(matchSide(m,role));
-}
-function sideThai(v){
-  const raw=String(v??'').trim();
-  if(!raw||raw==='-')return '-';
-  const s=raw.toUpperCase();
-  if(['HI','HIGH','H','OVER','UP','สูง','แทงสูง'].includes(s)||raw==='สูง')return 'สูง';
-  if(['LO','LOW','L','UNDER','DOWN','ต่ำ','ตํ่า','แทงต่ำ'].includes(s)||raw==='ต่ำ'||raw==='ตํ่า')return 'ต่ำ';
-  return raw;
-}
-function oppositeSide(v){
-  const s=sideThai(v);
-  if(s==='สูง')return 'ต่ำ';
-  if(s==='ต่ำ')return 'สูง';
-  return '-';
-}
-function sideClass(v){
-  const s=sideThai(v);
-  if(s==='สูง')return 'hi';
-  if(s==='ต่ำ')return 'lo';
-  return 'mid';
-}
-function matchSide(m,role){
-  const makerKeys=['maker_side','makerSide','maker_bet_side','makerBetSide','maker_choice','makerChoice','maker_bet','makerBet','creator_side','a_side','side_a'];
-  const takerKeys=['taker_side','takerSide','taker_bet_side','takerBetSide','taker_choice','takerChoice','taker_bet','takerBet','receiver_side','b_side','side_b'];
-  const direct=sideThai(pick(m,role==='maker'?makerKeys:takerKeys,'-'));
-  if(direct!=='-')return direct;
-
-  // กรณี backend ส่งมาแค่ side เดียว ให้ maker ใช้ side นั้น และ taker เป็นฝั่งตรงข้าม
-  const one=sideThai(pick(m,['side','bet_side','betSide','choice'],'-'));
-  if(one!=='-')return role==='maker'?one:oppositeSide(one);
-
-  // กรณี backend ส่งฝั่งตรงข้ามมาอีกฝั่งเดียว
-  const other=sideThai(pick(m,role==='maker'?takerKeys:makerKeys,'-'));
-  if(other!=='-')return oppositeSide(other);
-  return '-';
-}
-function playerName(m,role){
-  return pick(m,role==='maker'
-    ? ['maker_name','makerName','maker_display_name','makerDisplayName','maker','player_a','playerA','a_name','name_a','from_name']
-    : ['taker_name','takerName','taker_display_name','takerDisplayName','taker','player_b','playerB','b_name','name_b','to_name']
-  ,'-');
-}
-function matchAmount(m){return Number(pick(m,['amount','matched_amount','match_amount','stake','bet_amount','price'],0))||0}
-function renderMatchCard(m,i,roundName=''){
-  const maker=playerName(m,'maker');
-  const taker=playerName(m,'taker');
-  const makerSide=matchSide(m,'maker');
-  const takerSide=matchSide(m,'taker');
-  const amount=matchAmount(m);
-  const makerPlay=playText(m,'maker',amount,roundName);
-  const takerPlay=playText(m,'taker',amount,roundName);
-  const pairNo=pick(m,['pairNo','pair_no','match_no','matchNo','order_no','orderNo','id'],i+1);
-  const rate=pick(m,['rate','odds','payout_rate','payoutRate','price_rate'],'-');
-  return `<div class="match-card">
-    <div class="match-card-top">
-      <span class="match-no">#${esc(pairNo)}</span>
-      ${sbadge(m.status)}
-      <span class="match-time">${fmtD(pick(m,['created_at','createdAt','matched_at','matchedAt','time'],'-'))}</span>
-    </div>
-    <div class="match-vs">
-      <div class="player-box">
-        <div class="player-role">นาย A / Maker</div>
-        <div class="player-name">${esc(maker)}</div>
-        <div class="play-text">${esc(makerPlay)}</div>
-        <div class="play-caption">ข้อความที่เล่นจาก LINE</div>
-        <span class="side-badge ${sideClass(makerSide)}">${esc(makerSide)}</span>
-      </div>
-      <div class="vs-dot">VS</div>
-      <div class="player-box">
-        <div class="player-role">นาย B / Taker</div>
-        <div class="player-name">${esc(taker)}</div>
-        <div class="play-text">${esc(takerPlay)}</div>
-        <div class="play-caption">ข้อความที่ตอบรับ/เล่นจาก LINE</div>
-        <span class="side-badge ${sideClass(takerSide)}">${esc(takerSide)}</span>
-      </div>
-    </div>
-    <div class="match-foot">
-      <span>ยอดจับคู่: <span class="match-amount">${fmt(amount)}</span></span>
-      ${rate!=='-'?`<span>ราคา/เรท: <strong>${esc(rate)}</strong></span>`:''}
-      <div class="play-line">
-        <span>สรุป:</span>
-        <span class="who">${esc(maker)}</span>
-        <span>เล่น</span>
-        <span class="cmd">${esc(makerPlay)}</span>
-        <span>กับ</span>
-        <span class="who">${esc(taker)}</span>
-        <span>เล่น</span>
-        <span class="cmd">${esc(takerPlay)}</span>
-      </div>
-    </div>
-  </div>`;
-}
-async function openRoundDet(rid,name){
-  $('m-round-title').textContent='รอบ: '+(name||rid||'-');
-  $('m-round-body').innerHTML='<div class="loading"><div class="spin"></div></div>';
-  openMod('m-round');
-  try{
-    if(!rid||rid==='-'){
-      $('m-round-body').innerHTML='<div class="empty">ไม่พบรหัสรอบ จึงโหลดคู่แทงไม่ได้</div>';
-      return;
-    }
-    const d=await api('/dashboard/api/rounds/'+encodeURIComponent(rid)+'/matches');
-    const ms=Array.isArray(d.data)?d.data:(d.data?.matches||d.matches||[]);
-    $('m-round-body').innerHTML=ms.length
-      ? `<div class="match-summary">🔗 <strong>${fmt(ms.length)} คู่จับคู่</strong><span>แสดงว่า นาย A เล่นข้อความอะไร กับ นาย B เล่น/ตอบรับอะไร</span></div><div class="match-list">${ms.map((m,i)=>renderMatchCard(m,i,name)).join('')}</div>`
-      : '<div class="empty">ยังไม่มีคู่จับคู่ในรอบนี้</div>';
-  }catch(e){
-    $('m-round-body').innerHTML='<div class="empty">โหลดคู่แทงไม่ได้</div>';
-  }
-}
+async function openRoundDet(rid,name){$('m-round-title').textContent='รอบ: '+name;$('m-round-body').innerHTML='<div class="loading"><div class="spin"></div></div>';openMod('m-round');try{const d=await api('/dashboard/api/rounds/'+encodeURIComponent(rid)+'/matches');const ms=d.data||[];$('m-round-body').innerHTML=ms.length?`<div style="font-size:.7rem;color:var(--text2);margin-bottom:.55rem">${fmt(ms.length)} คู่</div><table class="mtbl"><tr><th>Maker</th><th>Taker</th><th>จำนวน</th><th>สถานะ</th><th>เวลา</th></tr>${ms.map(m=>`<tr><td>${esc(m.maker_name||'-')}</td><td>${esc(m.taker_name||'-')}</td><td style="font-family:'JetBrains Mono',monospace;color:var(--yellow)">${fmt(m.amount)}</td><td>${sbadge(m.status)}</td><td style="font-size:.65rem;color:var(--text3)">${fmtD(m.created_at)}</td></tr>`).join('')}</table>`:'<div class="empty">ไม่มีคู่แทง</div>'}catch{$('m-round-body').innerHTML='<div class="empty">โหลดไม่ได้</div>'}}
 
 // ========== PROFIT ==========
 async function loadProfit(){try{const d=await api('/dashboard/api/profit');const p=d.data;$('p-total').textContent=fmt(p.total_profit||0);$('p-updated').textContent='อัปเดต: '+fmtD(p.updated_at);$('p-cnt').textContent=fmt((p.rounds||[]).length);const rows=(p.rounds||[]).slice(0,50).reverse();$('p-tbody').innerHTML=rows.map(r=>`<tr><td class="mono" style="color:var(--text3)">${(r.round_id||'-').substring(0,14)}...</td><td>${esc(r.camp_name||r.base_no||'-')}</td><td style="font-family:'JetBrains Mono',monospace;font-weight:700;color:${(r.profit||0)>=0?'var(--neon)':'var(--red)'}">${(r.profit||0)>=0?'+':''}${fmt(r.profit||0)}</td><td style="font-size:.7rem;color:var(--text3)">${fmtD(r.settled_at)}</td></tr>`).join('')||'<tr><td colspan="4"><div class="empty">ไม่มีข้อมูล</div></td></tr>';drawPChart(rows);}catch{toast('โหลดกำไรไม่ได้','error')}}
