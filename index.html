@@ -3,952 +3,872 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Bot Admin Dashboardป</title>
-<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<title>ThaokayNoi Management Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --bg:#0d1117;
-  --bg2:#161b22;
-  --bg3:#1c2128;
-  --bg4:#22272e;
-  --border:#30363d;
-  --border2:#444c56;
-  --text:#e6edf3;
-  --text2:#8b949e;
-  --text3:#6e7681;
-  --accent:#58a6ff;
-  --accent2:#1f6feb;
-  --green:#3fb950;
-  --green2:#0d4429;
-  --yellow:#d29922;
-  --yellow2:#3d2b00;
-  --red:#f85149;
-  --red2:#3d0000;
-  --purple:#a371f7;
-  --purple2:#2d1f56;
-  --orange:#e3b341;
-  --teal:#39d353;
-  --radius:8px;
-  --radius2:12px;
+  --bg:#0a0e14;--bg2:#0f1419;--bg3:#141c24;--bg4:#1a2332;
+  --border:#1e2d3d;--border2:#2a3f55;
+  --neon:#00ff88;--neon2:#00cc6a;--neon-dim:#00ff8818;--neon-glow:0 0 12px #00ff8866;
+  --blue:#00b4ff;--blue-dim:#00b4ff18;
+  --purple:#a855f7;--purple-dim:#a855f718;
+  --orange:#ff8c00;--orange-dim:#ff8c0018;
+  --red:#ff4444;--red-dim:#ff444418;
+  --yellow:#ffd700;--yellow-dim:#ffd70018;
+  --text:#c9d8e8;--text2:#6b8299;--text3:#3d5166;
+  --radius:8px;--radius2:12px;
 }
-body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--text);font-size:14px;line-height:1.6;min-height:100vh}
-.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--text);font-size:13px;line-height:1.5;min-height:100vh}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse at 15% 15%,#00ff8808,transparent 45%),radial-gradient(ellipse at 85% 85%,#00b4ff06,transparent 45%);pointer-events:none;z-index:0}
 
-/* Login overlay */
+/* LOGIN */
 #login-overlay{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:1000}
-.login-box{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius2);padding:2.5rem;width:380px;max-width:90vw}
-.login-box h1{font-size:1.4rem;font-weight:600;margin-bottom:.25rem;color:var(--text)}
-.login-box p{color:var(--text2);font-size:.875rem;margin-bottom:1.5rem}
-.login-box input{width:100%;padding:.6rem .9rem;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-family:'Sarabun',sans-serif;font-size:.875rem;margin-bottom:.75rem;outline:none;transition:border-color .2s}
-.login-box input:focus{border-color:var(--accent)}
-.btn-primary{width:100%;padding:.7rem;background:var(--accent2);border:none;border-radius:var(--radius);color:#fff;font-family:'Sarabun',sans-serif;font-size:.9rem;font-weight:600;cursor:pointer;transition:opacity .2s}
-.btn-primary:hover{opacity:.85}
-.login-error{color:var(--red);font-size:.8rem;margin-top:.5rem;display:none}
+.login-box{background:var(--bg2);border:1px solid var(--border2);border-radius:16px;padding:2.5rem;width:440px;max-width:92vw;position:relative;overflow:hidden}
+.login-box::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--neon),transparent)}
+.login-logo{display:flex;align-items:center;gap:.75rem;margin-bottom:.4rem}
+.lb-tag{background:#06c755;color:#fff;font-size:.6rem;font-weight:700;padding:.2rem .5rem;border-radius:4px;letter-spacing:.05em}
+.login-box h1{font-size:1.25rem;font-weight:700;color:var(--text)}
+.login-box p{color:var(--text2);font-size:.8rem;margin-bottom:1.4rem}
+.login-box input{width:100%;padding:.65rem 1rem;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius);color:var(--text);font-family:'Sarabun',sans-serif;font-size:.875rem;margin-bottom:.65rem;outline:none;transition:border-color .2s,box-shadow .2s}
+.login-box input:focus{border-color:var(--neon);box-shadow:0 0 0 3px var(--neon-dim)}
+.remember-row{display:flex;align-items:center;gap:.5rem;margin-bottom:1rem;cursor:pointer}
+.remember-row input[type=checkbox]{width:14px;height:14px;accent-color:var(--neon);cursor:pointer;margin:0}
+.remember-row span{font-size:.78rem;color:var(--text2)}
+.saved-accounts{margin-bottom:.85rem}
+.saved-accounts label{font-size:.68rem;color:var(--text2);display:block;margin-bottom:.3rem}
+.saved-list{display:flex;flex-direction:column;gap:.3rem}
+.saved-item{display:flex;align-items:center;gap:.5rem;padding:.4rem .6rem;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);cursor:pointer;transition:border-color .15s}
+.saved-item:hover{border-color:var(--neon2)}
+.saved-item-info{flex:1;min-width:0}
+.saved-item-url{font-size:.72rem;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.saved-item-nick{font-size:.65rem;color:var(--text2)}
+.saved-del{background:none;border:none;color:var(--text3);cursor:pointer;font-size:.8rem;padding:.1rem .3rem;border-radius:4px;transition:color .15s}
+.saved-del:hover{color:var(--red)}
+.btn-login{width:100%;padding:.72rem;background:var(--neon);border:none;border-radius:var(--radius);color:#0a0e14;font-family:'Sarabun',sans-serif;font-size:.95rem;font-weight:700;cursor:pointer;transition:all .2s}
+.btn-login:hover{background:var(--neon2);box-shadow:var(--neon-glow)}
+.login-error{color:var(--red);font-size:.78rem;margin-top:.5rem;display:none}
+.login-nick-row{display:flex;gap:.5rem;margin-bottom:.65rem}
+.login-nick-row input{margin-bottom:0}
 
-/* Layout */
-#app{display:none}
-.topbar{height:56px;background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 1.5rem;gap:1rem;position:sticky;top:0;z-index:100}
-.topbar-brand{display:flex;align-items:center;gap:.6rem;font-weight:700;font-size:1rem;color:var(--text)}
-.topbar-brand .dot{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green);animation:pulse 2s infinite}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
-.topbar-spacer{flex:1}
-.topbar-time{font-family:'JetBrains Mono',monospace;font-size:.75rem;color:var(--text2)}
-.topbar-logout{padding:.4rem .8rem;background:transparent;border:1px solid var(--border);border-radius:var(--radius);color:var(--text2);cursor:pointer;font-family:'Sarabun',sans-serif;font-size:.8rem;transition:all .2s}
-.topbar-logout:hover{border-color:var(--red);color:var(--red)}
+/* APP */
+#app{display:none;position:relative;z-index:1}
+.topbar{height:50px;background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 1.1rem;gap:.7rem;position:sticky;top:0;z-index:100}
+.tb-linebadge{background:#06c755;color:#fff;font-size:.6rem;font-weight:700;padding:.18rem .45rem;border-radius:4px;letter-spacing:.05em;flex-shrink:0}
+.tb-titles{line-height:1.2}
+.tb-title{font-size:.9rem;font-weight:700;color:var(--text)}
+.tb-sub{font-size:.65rem;color:var(--text2)}
+.tb-spacer{flex:1}
+.live-badge{display:flex;align-items:center;gap:.35rem;background:var(--neon-dim);border:1px solid #00ff8833;border-radius:20px;padding:.22rem .65rem;font-size:.65rem;font-weight:700;color:var(--neon);letter-spacing:.05em}
+.live-dot{width:5px;height:5px;border-radius:50%;background:var(--neon);animation:blink 1.4s infinite}
+@keyframes blink{0%,100%{opacity:1;box-shadow:0 0 5px var(--neon)}50%{opacity:.2;box-shadow:none}}
+.tb-time{font-family:'JetBrains Mono',monospace;font-size:.68rem;color:var(--text2)}
+.tb-logout{padding:.28rem .65rem;background:transparent;border:1px solid var(--border2);border-radius:var(--radius);color:var(--text2);cursor:pointer;font-size:.72rem;font-family:'Sarabun',sans-serif;transition:all .2s}
+.tb-logout:hover{border-color:var(--red);color:var(--red)}
 
-.layout{display:flex}
-.sidebar{width:220px;min-height:calc(100vh - 56px);background:var(--bg2);border-right:1px solid var(--border);padding:1rem .75rem;flex-shrink:0;position:sticky;top:56px;align-self:flex-start;height:calc(100vh - 56px);overflow-y:auto}
-.nav-label{font-size:.7rem;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;padding:.5rem .6rem .25rem;margin-top:.5rem}
-.nav-item{display:flex;align-items:center;gap:.6rem;padding:.5rem .6rem;border-radius:var(--radius);cursor:pointer;color:var(--text2);font-size:.875rem;transition:all .15s;border:none;background:none;width:100%;text-align:left}
-.nav-item:hover{background:var(--bg3);color:var(--text)}
-.nav-item.active{background:var(--bg4);color:var(--accent);font-weight:500}
-.nav-item svg{width:16px;height:16px;flex-shrink:0}
+.main-wrap{display:flex}
+.sidebar{width:200px;min-height:calc(100vh - 50px);background:var(--bg2);border-right:1px solid var(--border);padding:.7rem .55rem;flex-shrink:0;position:sticky;top:50px;height:calc(100vh - 50px);overflow-y:auto}
+.nav-sec{font-size:.62rem;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.1em;padding:.5rem .5rem .2rem;margin-top:.4rem}
+.nav-btn{display:flex;align-items:center;gap:.5rem;padding:.48rem .55rem;border-radius:var(--radius);cursor:pointer;color:var(--text2);font-size:.78rem;transition:all .12s;border:none;background:none;width:100%;text-align:left}
+.nav-btn:hover{background:var(--bg3);color:var(--text)}
+.nav-btn.active{background:var(--neon-dim);color:var(--neon);border:1px solid #00ff8828}
+.nav-btn svg{width:13px;height:13px;flex-shrink:0}
+.nav-btn .ndot{width:5px;height:5px;border-radius:50%;background:var(--neon);margin-left:auto;display:none}
+.nav-btn.active .ndot{display:block}
 
-.main{flex:1;padding:1.5rem;overflow-x:hidden}
+.content{flex:1;padding:1.1rem;overflow-x:hidden;min-width:0}
+.page{display:none}.page.active{display:block}
 
-/* Stat cards */
-.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1rem;margin-bottom:1.5rem}
-.stat-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius2);padding:1.25rem}
-.stat-label{font-size:.75rem;color:var(--text2);margin-bottom:.4rem;display:flex;align-items:center;gap:.4rem}
-.stat-label svg{width:14px;height:14px}
-.stat-value{font-size:1.75rem;font-weight:700;font-family:'JetBrains Mono',monospace;color:var(--text);line-height:1}
-.stat-sub{font-size:.75rem;color:var(--text3);margin-top:.3rem}
-.stat-card.green .stat-value{color:var(--green)}
-.stat-card.blue .stat-value{color:var(--accent)}
-.stat-card.yellow .stat-value{color:var(--yellow)}
-.stat-card.purple .stat-value{color:var(--purple)}
+/* STAT CARDS */
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:.65rem;margin-bottom:.9rem}
+.scard{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius2);padding:.9rem 1rem;position:relative;overflow:hidden;transition:border-color .2s}
+.scard:hover{border-color:var(--border2)}
+.scard::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;opacity:.5}
+.cg::after{background:var(--neon)}.cb::after{background:var(--blue)}.cp::after{background:var(--purple)}.co::after{background:var(--orange)}
+.scard-icon{font-size:1rem;margin-bottom:.35rem}
+.scard-lbl{font-size:.68rem;color:var(--text2);margin-bottom:.15rem}
+.scard-val{font-size:1.7rem;font-weight:700;font-family:'JetBrains Mono',monospace;line-height:1}
+.cg .scard-val{color:var(--neon)}.cb .scard-val{color:var(--blue)}.cp .scard-val{color:var(--purple)}.co .scard-val{color:var(--orange)}
+.scard-sub{font-size:.65rem;color:var(--text3);margin-top:.2rem}
 
-/* Section header */
-.section-hdr{display:flex;align-items:center;gap:.75rem;margin-bottom:1rem}
-.section-hdr h2{font-size:1rem;font-weight:600;color:var(--text)}
-.section-hdr .badge{font-size:.7rem;padding:.15rem .5rem;border-radius:20px;background:var(--bg3);border:1px solid var(--border);color:var(--text2)}
-.section-hdr-spacer{flex:1}
-.btn-sm{padding:.35rem .75rem;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);color:var(--text2);cursor:pointer;font-family:'Sarabun',sans-serif;font-size:.8rem;transition:all .15s;display:inline-flex;align-items:center;gap:.35rem}
-.btn-sm:hover{border-color:var(--border2);color:var(--text)}
-.btn-sm.primary{background:var(--accent2);border-color:var(--accent2);color:#fff}
-.btn-sm.primary:hover{opacity:.85}
-.btn-sm.danger{background:var(--red2);border-color:var(--red);color:var(--red)}
+/* PANELS */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:.65rem;margin-bottom:.65rem}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.65rem;margin-bottom:.65rem}
+.panel{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius2);overflow:hidden}
+.phdr{display:flex;align-items:center;gap:.45rem;padding:.6rem .85rem;border-bottom:1px solid var(--border)}
+.phdr h3{font-size:.78rem;font-weight:600;color:var(--text);flex:1}
+.tag{font-size:.62rem;padding:.12rem .45rem;border-radius:20px;font-weight:600;border:1px solid}
+.tg{background:var(--neon-dim);color:var(--neon);border-color:#00ff8833}
+.tb_{background:var(--blue-dim);color:var(--blue);border-color:#00b4ff33}
+.to{background:var(--orange-dim);color:var(--orange);border-color:#ff8c0033}
+.tr{background:var(--red-dim);color:var(--red);border-color:#ff444433}
+.pbody{padding:.75rem .85rem}
 
-/* Table */
-.table-wrap{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius2);overflow:hidden}
-.table-toolbar{padding:.75rem 1rem;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:.75rem}
-.search-input{flex:1;max-width:280px;padding:.4rem .8rem;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-family:'Sarabun',sans-serif;font-size:.8rem;outline:none;transition:border-color .2s}
-.search-input:focus{border-color:var(--accent)}
+/* MEMBER LIST */
+.mrow{display:flex;align-items:center;gap:.55rem;padding:.48rem 0;border-bottom:1px solid var(--border)}
+.mrow:last-child{border-bottom:none}
+.mrank{width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.6rem;font-weight:700;flex-shrink:0}
+.r1{background:#ffd70020;color:#ffd700;border:1px solid #ffd70055}.r2{background:#c0c0c020;color:#c0c0c0;border:1px solid #c0c0c055}.r3{background:#cd7f3220;color:#cd7f32;border:1px solid #cd7f3255}.rn{background:var(--bg3);color:var(--text3);border:1px solid var(--border)}
+.minfo{flex:1;min-width:0}
+.mname{font-size:.78rem;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mid_{font-size:.62rem;color:var(--text3);font-family:'JetBrains Mono',monospace}
+.mcredit{font-family:'JetBrains Mono',monospace;font-size:.82rem;font-weight:700;color:var(--neon)}
+.mcredit0{color:var(--text3)}
+
+/* ROUND MINI */
+.rmini{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:.6rem .75rem;margin-bottom:.45rem;cursor:pointer;transition:all .13s}
+.rmini:hover{border-color:var(--neon2)}.rmini.open{border-left:2px solid var(--neon)}
+.rmini-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:.25rem}
+.rname{font-size:.78rem;font-weight:600;color:var(--text)}
+.rstats{display:flex;gap:.65rem;font-size:.68rem;color:var(--text2)}
+.rstats .rv{color:var(--text);font-weight:500}
+
+/* TABLE */
+.twrap{overflow-x:auto}
 table{width:100%;border-collapse:collapse}
-th{padding:.6rem 1rem;font-size:.75rem;font-weight:600;color:var(--text2);text-align:left;border-bottom:1px solid var(--border);background:var(--bg3);white-space:nowrap}
-th.sortable{cursor:pointer;user-select:none}
-th.sortable:hover{color:var(--text)}
-td{padding:.65rem 1rem;font-size:.825rem;border-bottom:1px solid var(--border);color:var(--text);vertical-align:middle}
+th{padding:.45rem .7rem;font-size:.62rem;font-weight:700;color:var(--text2);text-align:left;border-bottom:1px solid var(--border);background:var(--bg3);white-space:nowrap;text-transform:uppercase;letter-spacing:.06em}
+td{padding:.5rem .7rem;font-size:.76rem;border-bottom:1px solid var(--border);color:var(--text);vertical-align:middle}
 tr:last-child td{border-bottom:none}
-tr:hover td{background:var(--bg3)}
-.mono{font-family:'JetBrains Mono',monospace;font-size:.75rem}
-.badge-pill{display:inline-flex;align-items:center;gap:.25rem;padding:.15rem .55rem;border-radius:20px;font-size:.72rem;font-weight:600}
-.badge-green{background:var(--green2);color:var(--green);border:1px solid #2ea04380}
-.badge-yellow{background:var(--yellow2);color:var(--yellow);border:1px solid #d2992280}
-.badge-red{background:var(--red2);color:var(--red);border:1px solid #f8514980}
-.badge-gray{background:var(--bg4);color:var(--text2);border:1px solid var(--border)}
-.badge-blue{background:#0d2d57;color:var(--accent);border:1px solid #1f6feb80}
-.badge-purple{background:var(--purple2);color:var(--purple);border:1px solid #a371f780}
-.avatar{width:28px;height:28px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:.65rem;font-weight:700;flex-shrink:0}
-.credit-num{font-family:'JetBrains Mono',monospace;font-weight:600}
-.credit-num.high{color:var(--green)}
-.credit-num.mid{color:var(--yellow)}
-.credit-num.low{color:var(--text2)}
-.action-btn{padding:.25rem .55rem;background:transparent;border:1px solid var(--border);border-radius:var(--radius);color:var(--text2);cursor:pointer;font-size:.75rem;font-family:'Sarabun',sans-serif;transition:all .15s}
-.action-btn:hover{border-color:var(--accent);color:var(--accent)}
-.action-btn.danger:hover{border-color:var(--red);color:var(--red)}
+tr:hover td{background:#ffffff03}
+.mono{font-family:'JetBrains Mono',monospace;font-size:.7rem}
 
-/* Pagination */
-.pagination{display:flex;align-items:center;gap:.5rem;padding:.75rem 1rem;border-top:1px solid var(--border);font-size:.8rem;color:var(--text2)}
-.page-btn{padding:.3rem .6rem;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);color:var(--text2);cursor:pointer;font-family:'Sarabun',sans-serif;font-size:.75rem;transition:all .15s}
-.page-btn:hover:not(:disabled){border-color:var(--accent);color:var(--accent)}
-.page-btn:disabled{opacity:.4;cursor:not-allowed}
-.page-btn.active{background:var(--accent2);border-color:var(--accent2);color:#fff}
+/* BADGE */
+.badge{display:inline-flex;align-items:center;gap:.18rem;padding:.1rem .42rem;border-radius:20px;font-size:.62rem;font-weight:700;border:1px solid;white-space:nowrap}
+.bg_{background:var(--neon-dim);color:var(--neon);border-color:#00ff8830}
+.bb_{background:var(--blue-dim);color:var(--blue);border-color:#00b4ff30}
+.bp_{background:var(--purple-dim);color:var(--purple);border-color:#a855f730}
+.bo_{background:var(--orange-dim);color:var(--orange);border-color:#ff8c0030}
+.br_{background:var(--red-dim);color:var(--red);border-color:#ff444430}
+.bgr{background:var(--bg4);color:var(--text2);border-color:var(--border)}
 
-/* Rounds */
-.rounds-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1rem}
-.round-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius2);padding:1.25rem;cursor:pointer;transition:all .2s}
-.round-card:hover{border-color:var(--border2);background:var(--bg3)}
-.round-card.open{border-left:3px solid var(--green)}
-.round-card.settled{border-left:3px solid var(--text3)}
-.round-card-name{font-weight:600;font-size:1rem;margin-bottom:.5rem}
-.round-card-row{display:flex;justify-content:space-between;font-size:.8rem;color:var(--text2);margin:.2rem 0}
-.round-card-row span:last-child{color:var(--text);font-weight:500}
+/* AVATAR */
+.av{width:26px;height:26px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:.6rem;font-weight:700;flex-shrink:0}
 
-/* Profit chart area */
-.profit-area{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.5rem}
-@media(max-width:768px){.profit-area{grid-template-columns:1fr}}
-.chart-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius2);padding:1.25rem}
-.chart-card h3{font-size:.875rem;font-weight:600;color:var(--text);margin-bottom:1rem}
+/* BTNS */
+.btn{padding:.35rem .75rem;border:1px solid var(--border2);border-radius:var(--radius);font-family:'Sarabun',sans-serif;font-size:.75rem;cursor:pointer;transition:all .13s;display:inline-flex;align-items:center;gap:.3rem;background:transparent}
+.bng{color:var(--neon);border-color:#00ff8833;background:var(--neon-dim)}.bng:hover{box-shadow:var(--neon-glow)}
+.bbl{color:var(--blue);border-color:#00b4ff33;background:var(--blue-dim)}
+.brd{color:var(--red);border-color:#ff444433;background:var(--red-dim)}.brd:hover{box-shadow:0 0 10px #ff444455}
+.bor{color:var(--orange);border-color:#ff8c0033;background:var(--orange-dim)}
+.bgh{color:var(--text2)}.bgh:hover{background:var(--bg3);color:var(--text)}
+.abtn{padding:.2rem .48rem;background:transparent;border:1px solid var(--border);border-radius:6px;color:var(--text2);cursor:pointer;font-size:.7rem;font-family:'Sarabun',sans-serif;transition:all .13s}
+.abtn:hover{border-color:var(--neon);color:var(--neon)}
+.abtn.d:hover{border-color:var(--red);color:var(--red)}
 
-/* Top users list */
-.top-list{list-style:none}
-.top-list li{display:flex;align-items:center;gap:.75rem;padding:.6rem 0;border-bottom:1px solid var(--border)}
-.top-list li:last-child{border-bottom:none}
-.top-rank{font-family:'JetBrains Mono',monospace;font-size:.75rem;color:var(--text3);width:16px;text-align:center;flex-shrink:0}
-.top-name{flex:1;font-size:.875rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.top-credit{font-family:'JetBrains Mono',monospace;font-size:.875rem;font-weight:600;color:var(--green)}
+/* TOOLBAR */
+.toolbar{display:flex;align-items:center;gap:.55rem;padding:.55rem .75rem;border-bottom:1px solid var(--border);background:var(--bg3);flex-wrap:wrap}
+.sbox{flex:1;max-width:230px;min-width:120px;padding:.35rem .65rem;background:var(--bg2);border:1px solid var(--border2);border-radius:var(--radius);color:var(--text);font-family:'Sarabun',sans-serif;font-size:.76rem;outline:none;transition:border-color .2s}
+.sbox:focus{border-color:var(--neon)}
+.sel{padding:.35rem .55rem;background:var(--bg2);border:1px solid var(--border2);border-radius:var(--radius);color:var(--text);font-size:.76rem;cursor:pointer;outline:none}
 
-/* Modal */
-.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.75);display:flex;align-items:center;justify-content:center;z-index:500;opacity:0;pointer-events:none;transition:opacity .2s}
+/* PAGER */
+.pager{display:flex;align-items:center;gap:.35rem;padding:.55rem .75rem;border-top:1px solid var(--border)}
+.pgr-sp{flex:1}
+.pbtn{padding:.22rem .48rem;background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--text2);cursor:pointer;font-size:.7rem;transition:all .13s}
+.pbtn:hover:not([disabled]){border-color:var(--neon);color:var(--neon)}
+.pbtn[disabled]{opacity:.3;cursor:not-allowed}
+.pbtn.active{background:var(--neon-dim);border-color:var(--neon);color:var(--neon)}
+
+/* SYSTEM BUTTONS */
+.sys-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:.75rem;margin-bottom:1rem}
+.sys-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius2);padding:1.1rem;transition:border-color .2s}
+.sys-card:hover{border-color:var(--border2)}
+.sys-card.danger{border-color:#ff444425}
+.sys-card.warning{border-color:#ff8c0025}
+.sys-card-icon{font-size:1.4rem;margin-bottom:.5rem}
+.sys-card-title{font-size:.88rem;font-weight:700;color:var(--text);margin-bottom:.3rem}
+.sys-card-desc{font-size:.72rem;color:var(--text2);margin-bottom:.85rem;line-height:1.5}
+.sys-info{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:.6rem .75rem;margin-bottom:.85rem;font-size:.72rem;color:var(--text2)}
+.sys-info strong{color:var(--text)}
+
+/* MODAL */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.82);display:flex;align-items:center;justify-content:center;z-index:500;opacity:0;pointer-events:none;transition:opacity .18s}
 .modal-bg.open{opacity:1;pointer-events:all}
-.modal{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius2);width:480px;max-width:90vw;max-height:80vh;overflow-y:auto}
-.modal-hdr{display:flex;align-items:center;justify-content:space-between;padding:1rem 1.25rem;border-bottom:1px solid var(--border)}
-.modal-hdr h3{font-size:1rem;font-weight:600}
-.modal-close{background:none;border:none;color:var(--text2);cursor:pointer;font-size:1.2rem;line-height:1;padding:.2rem}
-.modal-close:hover{color:var(--text)}
-.modal-body{padding:1.25rem}
-.form-row{margin-bottom:1rem}
-.form-row label{display:block;font-size:.8rem;color:var(--text2);margin-bottom:.4rem}
-.form-row input,.form-row select{width:100%;padding:.55rem .8rem;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-family:'Sarabun',sans-serif;font-size:.875rem;outline:none;transition:border-color .2s}
-.form-row input:focus,.form-row select:focus{border-color:var(--accent)}
-.form-row select option{background:var(--bg3)}
-.modal-footer{display:flex;gap:.75rem;justify-content:flex-end;padding:1rem 1.25rem;border-top:1px solid var(--border)}
+.modal{background:var(--bg2);border:1px solid var(--border2);border-radius:var(--radius2);width:480px;max-width:92vw;max-height:85vh;overflow-y:auto;position:relative}
+.modal::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--neon),transparent)}
+.mhdr{display:flex;align-items:center;justify-content:space-between;padding:.8rem 1rem;border-bottom:1px solid var(--border)}
+.mhdr h3{font-size:.88rem;font-weight:600;color:var(--text)}
+.mx{background:none;border:none;color:var(--text2);cursor:pointer;font-size:.95rem;padding:.1rem}.mx:hover{color:var(--text)}
+.mbody{padding:.9rem 1rem}
+.mfoot{display:flex;gap:.55rem;justify-content:flex-end;padding:.8rem 1rem;border-top:1px solid var(--border)}
+.frow{margin-bottom:.75rem}
+.frow label{display:block;font-size:.7rem;color:var(--text2);margin-bottom:.28rem;font-weight:600}
+.frow input,.frow select{width:100%;padding:.48rem .7rem;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius);color:var(--text);font-family:'Sarabun',sans-serif;font-size:.8rem;outline:none;transition:border-color .2s,box-shadow .2s}
+.frow input:focus,.frow select:focus{border-color:var(--neon);box-shadow:0 0 0 2px var(--neon-dim)}
+.mtbl{width:100%;border-collapse:collapse;font-size:.7rem}
+.mtbl th{padding:.32rem .48rem;background:var(--bg3);color:var(--text2);font-weight:700;border-bottom:1px solid var(--border);text-transform:uppercase;font-size:.6rem;letter-spacing:.06em}
+.mtbl td{padding:.32rem .48rem;border-bottom:1px solid var(--border)}
+.mtbl tr:last-child td{border-bottom:none}
 
-/* Toast */
-.toast-wrap{position:fixed;bottom:1.5rem;right:1.5rem;z-index:900;display:flex;flex-direction:column;gap:.5rem}
-.toast{padding:.7rem 1rem;border-radius:var(--radius);font-size:.85rem;border:1px solid;display:flex;align-items:center;gap:.5rem;animation:slideIn .25s ease;max-width:320px}
-.toast.success{background:#0d2d1a;border-color:var(--green);color:var(--green)}
-.toast.error{background:var(--red2);border-color:var(--red);color:var(--red)}
-.toast.info{background:#0d2457;border-color:var(--accent);color:var(--accent)}
-@keyframes slideIn{from{transform:translateX(20px);opacity:0}to{transform:translateX(0);opacity:1}}
+/* CONFIRM BOX */
+.confirm-box{background:var(--red-dim);border:1px solid var(--red);border-radius:var(--radius);padding:.75rem .9rem;margin-bottom:.75rem;font-size:.78rem;color:var(--red)}
 
-/* Page sections */
-.page{display:none}
-.page.active{display:block}
+/* TOAST */
+.toast-wrap{position:fixed;bottom:1.1rem;right:1.1rem;z-index:900;display:flex;flex-direction:column;gap:.4rem}
+.toast{padding:.55rem .85rem;border-radius:var(--radius);font-size:.78rem;border:1px solid;display:flex;align-items:center;gap:.45rem;animation:tin .22s ease;max-width:300px}
+.toast.success{background:#00180d;border-color:var(--neon);color:var(--neon)}
+.toast.error{background:#180000;border-color:var(--red);color:var(--red)}
+.toast.info{background:#001018;border-color:var(--blue);color:var(--blue)}
+.toast.warning{background:#180e00;border-color:var(--orange);color:var(--orange)}
+@keyframes tin{from{transform:translateX(14px);opacity:0}to{transform:translateX(0);opacity:1}}
 
-/* Loading */
-.loading{display:flex;align-items:center;justify-content:center;padding:3rem;color:var(--text3);gap:.75rem}
-.spinner{width:18px;height:18px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0}
+/* MISC */
+.loading{display:flex;align-items:center;justify-content:center;padding:2rem;color:var(--text3);gap:.55rem;font-size:.78rem}
+.spin{width:15px;height:15px;border:2px solid var(--border2);border-top-color:var(--neon);border-radius:50%;animation:spin .6s linear infinite;flex-shrink:0}
 @keyframes spin{to{transform:rotate(360deg)}}
-
-/* Empty state */
-.empty{text-align:center;padding:3rem;color:var(--text3)}
-.empty svg{width:40px;height:40px;margin-bottom:.75rem;opacity:.4}
-
-/* Live indicator */
-.live-dot{width:8px;height:8px;border-radius:50%;background:var(--green);display:inline-block;margin-right:.35rem;animation:pulse 2s infinite}
-
-/* Scrollbar */
-::-webkit-scrollbar{width:6px;height:6px}
+.empty{text-align:center;padding:2rem;color:var(--text3);font-size:.78rem}
+.shdr{display:flex;align-items:center;gap:.55rem;margin-bottom:.7rem}
+.shdr h2{font-size:.88rem;font-weight:700;color:var(--text)}
+.shdr .cnt{font-size:.65rem;padding:.1rem .42rem;border-radius:20px;background:var(--bg3);border:1px solid var(--border);color:var(--text2)}
+.shdr-sp{flex:1}
+.cred-row{display:flex;gap:.45rem;align-items:center;margin-top:.5rem}
+.cred-row input{width:105px;padding:.36rem .58rem;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius);color:var(--text);font-family:'JetBrains Mono',monospace;font-size:.8rem;outline:none}
+.cred-row input:focus{border-color:var(--neon)}
+::-webkit-scrollbar{width:4px;height:4px}
 ::-webkit-scrollbar-track{background:var(--bg)}
-::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
-::-webkit-scrollbar-thumb:hover{background:var(--text3)}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
 
-/* User detail panel */
-.user-detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem}
-@media(max-width:600px){.user-detail-grid{grid-template-columns:1fr}}
-.detail-item label{font-size:.75rem;color:var(--text3);display:block;margin-bottom:.2rem}
-.detail-item value{font-size:.9rem;color:var(--text);font-weight:500}
-.matches-mini-table{width:100%;border-collapse:collapse;font-size:.78rem}
-.matches-mini-table th{padding:.4rem .6rem;background:var(--bg3);color:var(--text2);font-weight:600;border-bottom:1px solid var(--border)}
-.matches-mini-table td{padding:.4rem .6rem;border-bottom:1px solid var(--border)}
-.matches-mini-table tr:last-child td{border-bottom:none}
-.credit-edit-row{display:flex;gap:.5rem;align-items:center;margin-top:.5rem}
-.credit-edit-row input{width:120px;padding:.4rem .6rem;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-family:'JetBrains Mono',monospace;font-size:.875rem;outline:none}
-.credit-edit-row input:focus{border-color:var(--accent)}
+/* ADMIN CARD */
+.admin-row{display:flex;align-items:center;gap:.6rem;padding:.55rem 0;border-bottom:1px solid var(--border)}
+.admin-row:last-child{border-bottom:none}
+.admin-source{font-size:.6rem;padding:.08rem .38rem;border-radius:20px;border:1px solid}
+.admin-env{background:#00180d;color:var(--neon);border-color:#00ff8830}
+.admin-dyn{background:var(--blue-dim);color:var(--blue);border-color:#00b4ff30}
+
+/* RESULT BOX */
+.result-box{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:.65rem .85rem;font-size:.75rem;color:var(--text);white-space:pre-wrap;line-height:1.6;max-height:200px;overflow-y:auto;font-family:'JetBrains Mono',monospace}
 </style>
 </head>
 <body>
 
+<!-- LOGIN -->
 <div id="login-overlay">
   <div class="login-box">
-    <h1>🤖 Bot Admin</h1>
-    <p>กรุณาเข้าสู่ระบบเพื่อจัดการ dashboard</p>
-    <input type="text" id="login-url" placeholder="Base URL (เช่น https://yourbot.com)" autocomplete="off">
-    <input type="password" id="login-token" placeholder="Dashboard Token" autocomplete="off">
-    <button class="btn-primary" onclick="doLogin()">เข้าสู่ระบบ</button>
-    <div class="login-error" id="login-error">Token หรือ URL ไม่ถูกต้อง กรุณาลองใหม่</div>
+    <div class="login-logo"><span class="lb-tag">LINE OA</span><h1>Chatbot Management</h1></div>
+    <p>กรุณาเข้าสู่ระบบเพื่อจัดการระบบบอท</p>
+
+    <!-- Saved accounts -->
+    <div class="saved-accounts" id="saved-accounts" style="display:none">
+      <label>📌 บัญชีที่บันทึกไว้</label>
+      <div class="saved-list" id="saved-list"></div>
+    </div>
+
+    <div class="login-nick-row">
+      <input type="text" id="li-nick" placeholder="ชื่อเรียก (ไม่บังคับ)" style="width:40%">
+      <input type="text" id="li-url" placeholder="Base URL เช่น https://yourbot.com" style="width:60%">
+    </div>
+    <input type="password" id="li-tok" placeholder="Dashboard Token" autocomplete="off">
+
+    <label class="remember-row">
+      <input type="checkbox" id="li-remember" checked>
+      <span>จดจำรหัสผ่านและ URL ไว้ในเครื่องนี้</span>
+    </label>
+
+    <button class="btn-login" onclick="doLogin()">เข้าสู่ระบบ</button>
+    <div class="login-error" id="li-err">Token หรือ URL ไม่ถูกต้อง กรุณาลองใหม่</div>
   </div>
 </div>
 
+<!-- APP -->
 <div id="app">
   <div class="topbar">
-    <div class="topbar-brand">
-      <span class="dot"></span>
-      Bot Dashboard
+    <span class="lb-tag">LINE OA</span>
+    <div class="tb-titles">
+      <div class="tb-title">Chatbot Management System</div>
+      <div class="tb-sub" id="tb-sub">อัปเดต: — • ระบบบอทออนไลน์</div>
     </div>
-    <div class="topbar-spacer"></div>
-    <span class="live-dot"></span>
-    <span style="font-size:.75rem;color:var(--text2)">Live</span>
-    <span class="topbar-time" id="clock"></span>
-    <button class="topbar-logout" onclick="logout()">ออกจากระบบ</button>
+    <div class="tb-spacer"></div>
+    <div class="live-badge"><span class="live-dot"></span>LIVE SYSTEM</div>
+    <span class="tb-time" id="clock"></span>
+    <button class="tb-logout" onclick="logout()">ออกจากระบบ</button>
   </div>
 
-  <div class="layout">
+  <div class="main-wrap">
     <nav class="sidebar">
-      <div class="nav-label">ภาพรวม</div>
-      <button class="nav-item active" onclick="navigate('overview')">
+      <div class="nav-sec">ภาพรวม</div>
+      <button class="nav-btn active" onclick="goPage('overview')">
         <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="1" width="6" height="6" rx="1"/><rect x="9" y="1" width="6" height="6" rx="1"/><rect x="1" y="9" width="6" height="6" rx="1"/><rect x="9" y="9" width="6" height="6" rx="1"/></svg>
-        ภาพรวมระบบ
+        Dashboard<span class="ndot"></span>
       </button>
-      <div class="nav-label">จัดการ</div>
-      <button class="nav-item" onclick="navigate('users')">
+      <div class="nav-sec">จัดการ</div>
+      <button class="nav-btn" onclick="goPage('users')">
         <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="5" r="3"/><path d="M2 14c0-3.3 2.7-6 6-6s6 2.7 6 6"/></svg>
-        สมาชิก
+        สมาชิก<span class="ndot"></span>
       </button>
-      <button class="nav-item" onclick="navigate('rounds')">
+      <button class="nav-btn" onclick="goPage('rounds')">
         <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="6"/><path d="M8 4v4l3 2"/></svg>
-        รอบการเล่น
+        รอบการเล่น<span class="ndot"></span>
       </button>
-      <button class="nav-item" onclick="navigate('profit')">
-        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 12 L5 8 L8 10 L11 5 L14 7"/><path d="M14 3v4h-4"/></svg>
-        กำไร
+      <button class="nav-btn" onclick="goPage('profit')">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="2,12 5,8 8,10 11,5 14,7"/></svg>
+        กำไร<span class="ndot"></span>
+      </button>
+      <div class="nav-sec">ระบบ</div>
+      <button class="nav-btn" onclick="goPage('system')">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="12" height="12" rx="2"/><path d="M8 5v3l2 2"/></svg>
+        จัดการระบบ<span class="ndot"></span>
+      </button>
+      <button class="nav-btn" onclick="goPage('admins')">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 1l1.5 3 3.5.5-2.5 2.5.5 3.5L8 9l-3 1.5.5-3.5L3 4.5 6.5 4z"/></svg>
+        แอดมิน<span class="ndot"></span>
       </button>
     </nav>
 
-    <main class="main">
-      <!-- OVERVIEW PAGE -->
+    <div class="content">
+
+      <!-- OVERVIEW -->
       <div class="page active" id="page-overview">
-        <h2 class="sr-only">ภาพรวมระบบ Bot Dashboard</h2>
-        <div class="stats-grid" id="stats-grid">
-          <div class="stat-card">
-            <div class="stat-label">
-              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="5" r="3"/><path d="M2 14c0-3.3 2.7-6 6-6s6 2.7 6 6"/></svg>
-              สมาชิกทั้งหมด
-            </div>
-            <div class="stat-value" id="s-total-users">—</div>
-            <div class="stat-sub" id="s-active-users">กำลังโหลด...</div>
+        <div class="stats-row">
+          <div class="scard cg"><div class="scard-icon">👥</div><div class="scard-lbl">สมาชิกทั้งหมด</div><div class="scard-val" id="s-users">—</div><div class="scard-sub" id="s-active">ACTIVE: — รายการ</div></div>
+          <div class="scard cb"><div class="scard-icon">📋</div><div class="scard-lbl">บิลวันนี้</div><div class="scard-val" id="s-bets">—</div><div class="scard-sub" id="s-open">รอปิด/ยืนยัน: —</div></div>
+          <div class="scard co"><div class="scard-icon">💰</div><div class="scard-lbl">กำไรสะสม</div><div class="scard-val" id="s-profit">—</div><div class="scard-sub">เครดิต (ก่อน Reset)</div></div>
+          <div class="scard cp"><div class="scard-icon">🎮</div><div class="scard-lbl">รอบที่ผ่านแล้ว</div><div class="scard-val" id="s-rounds">—</div><div class="scard-sub">รอบทั้งหมดในระบบ</div></div>
+        </div>
+        <div class="g2">
+          <div class="panel">
+            <div class="phdr"><span>👤</span><h3>สมาชิก ACTIVE</h3><span class="tag tg" id="active-tag">— ออนไลน์</span></div>
+            <div class="pbody" style="padding:.5rem .75rem"><div id="top5"><div class="loading"><div class="spin"></div></div></div></div>
           </div>
-          <div class="stat-card blue">
-            <div class="stat-label">
-              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="6"/><path d="M8 5v3.5l2.5 1.5"/></svg>
-              รอบที่เปิดอยู่
-            </div>
-            <div class="stat-value" id="s-open-rounds">—</div>
-            <div class="stat-sub">รอบที่ยังไม่ปิด</div>
-          </div>
-          <div class="stat-card green">
-            <div class="stat-label">
-              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 2v12M5 5l3-3 3 3M5 11l3 3 3-3"/></svg>
-              เครดิตรวม
-            </div>
-            <div class="stat-value" id="s-total-credit">—</div>
-            <div class="stat-sub">เครดิตในระบบทั้งหมด</div>
-          </div>
-          <div class="stat-card yellow">
-            <div class="stat-label">
-              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 12 L5 8 L8 10 L11 5 L14 7"/></svg>
-              กำไรรวม
-            </div>
-            <div class="stat-value" id="s-total-profit">—</div>
-            <div class="stat-sub">กำไรสะสมทั้งหมด</div>
-          </div>
-          <div class="stat-card purple">
-            <div class="stat-label">
-              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 4h12M4 4V2h8v2M4 12l1-6h6l1 6"/></svg>
-              ยอดแทงรวม
-            </div>
-            <div class="stat-value" id="s-total-bets">—</div>
-            <div class="stat-sub">ยอดจับคู่ทั้งหมด</div>
+          <div class="panel">
+            <div class="phdr"><span>⚡</span><h3>สถานะรอบปัจจุบัน</h3><button class="tag tg" style="cursor:pointer;border:none;font-size:.62rem;font-weight:700;padding:.12rem .45rem;border-radius:20px;background:var(--neon-dim);color:var(--neon)" onclick="loadRounds()">แจ้งผลสด</button></div>
+            <div class="pbody" id="ov-rounds"><div class="loading"><div class="spin"></div></div></div>
           </div>
         </div>
-
-        <div class="profit-area">
-          <div class="chart-card">
-            <h3>Top 5 สมาชิกเครดิตสูงสุด</h3>
-            <ul class="top-list" id="top5-list">
-              <li><div class="loading"><div class="spinner"></div> กำลังโหลด...</div></li>
-            </ul>
-          </div>
-          <div class="chart-card">
-            <h3>กำไรล่าสุด (50 รอบ)</h3>
-            <div style="position:relative;width:100%;height:200px">
-              <canvas id="profit-chart" role="img" aria-label="กราฟแสดงกำไรในรอบล่าสุด">กราฟกำไรแต่ละรอบ</canvas>
+        <div class="g3">
+          <div class="panel">
+            <div class="phdr"><span>📊</span><h3>ระบบเดิมพัน</h3><span class="tag tb_">Real-time</span></div>
+            <div class="pbody" style="padding:.5rem .75rem">
+              <div id="ov-bets"><div class="loading"><div class="spin"></div></div></div>
+              <div style="margin-top:.65rem;padding-top:.55rem;border-top:1px solid var(--border)">
+                <div style="font-size:.65rem;color:var(--text2)">รวมยอดเดิมพัน</div>
+                <div style="font-family:'JetBrains Mono',monospace;font-size:1.25rem;font-weight:700;color:var(--yellow)" id="ov-total-bet">—</div>
+              </div>
             </div>
           </div>
-        </div>
-
-        <div class="section-hdr">
-          <h2>รอบที่เปิดอยู่</h2>
-          <div class="badge" id="open-rounds-count">0 รอบ</div>
-          <div class="section-hdr-spacer"></div>
-          <button class="btn-sm" onclick="navigate('rounds')">ดูทั้งหมด →</button>
-        </div>
-        <div class="rounds-grid" id="overview-rounds">
-          <div class="loading"><div class="spinner"></div> กำลังโหลด...</div>
+          <div class="panel">
+            <div class="phdr"><span>✅</span><h3>ระบบล้างกำไร</h3><span class="tag to">ล้างเมื่อเร็วๆนี้</span></div>
+            <div class="pbody" style="text-align:center">
+              <div style="font-size:.65rem;color:var(--text2)">กำไรสะสมล่าสุด</div>
+              <div style="font-family:'JetBrains Mono',monospace;font-size:2rem;font-weight:700;color:var(--neon)" id="ov-profit">—</div>
+              <div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:.5rem .65rem;margin-top:.5rem;text-align:left">
+                <div style="font-size:.65rem;color:var(--text2)">กำไรปัจจุบัน หลัง Reset</div>
+                <div style="font-family:'JetBrains Mono',monospace;font-size:1.15rem;font-weight:700;color:var(--neon)" id="ov-profit-now">0</div>
+              </div>
+              <div style="margin-top:.55rem;font-size:.65rem;color:var(--text2)">รอบล่าสุด: <span id="ov-profit-rounds" style="color:var(--text)">— รอบ</span></div>
+            </div>
+          </div>
+          <div class="panel">
+            <div class="phdr"><span>📈</span><h3>กำไรรอบล่าสุด</h3><span class="tag tg">50 รอบ</span></div>
+            <div class="pbody"><div style="position:relative;width:100%;height:175px"><canvas id="ov-chart" role="img" aria-label="กราฟกำไร">กราฟกำไร</canvas></div></div>
+          </div>
         </div>
       </div>
 
-      <!-- USERS PAGE -->
+      <!-- USERS -->
       <div class="page" id="page-users">
-        <div class="section-hdr">
-          <h2>สมาชิกทั้งหมด</h2>
-          <div class="badge" id="users-count-badge">—</div>
-          <div class="section-hdr-spacer"></div>
-          <button class="btn-sm primary" onclick="openAddCreditModal()">+ เติมเครดิต</button>
-        </div>
-        <div class="table-wrap">
-          <div class="table-toolbar">
-            <input type="search" class="search-input" id="user-search" placeholder="ค้นหาชื่อ / ไอดี / เลขสมาชิก..." oninput="debounceUserSearch()">
-            <select id="user-sort" onchange="loadUsers()" style="padding:.4rem .6rem;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-size:.8rem;cursor:pointer;outline:none">
-              <option value="credit">เรียงตามเครดิต</option>
-              <option value="name">เรียงตามชื่อ</option>
-              <option value="member_no">เรียงตามเลขสมาชิก</option>
-              <option value="last_seen">เรียงตามใช้งานล่าสุด</option>
+        <div class="shdr"><h2>👥 สมาชิกทั้งหมด</h2><span class="cnt" id="users-cnt">—</span><div class="shdr-sp"></div><button class="btn bng" onclick="openCreditModal()">+ เติมเครดิต</button></div>
+        <div class="panel">
+          <div class="toolbar">
+            <input type="search" class="sbox" id="u-search" placeholder="ค้นหาชื่อ / ID / เลขสมาชิก..." oninput="debSearch()">
+            <select class="sel" id="u-sort" onchange="loadUsers()">
+              <option value="credit">เครดิต ↓</option><option value="name">ชื่อ</option>
+              <option value="member_no">เลขสมาชิก</option><option value="last_seen">ใช้งานล่าสุด</option>
             </select>
-            <button class="btn-sm" onclick="loadUsers()">
-              <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 8 A6 6 0 1 1 14 8"/><path d="M14 4v4h-4"/></svg>
-              รีเฟรช
-            </button>
+            <button class="btn bgh" onclick="loadUsers()">↺ รีเฟรช</button>
           </div>
-          <table>
-            <thead>
-              <tr>
-                <th>#</th>
-                <th>ชื่อ</th>
-                <th class="sortable">เครดิต ↓</th>
-                <th>สมาชิก</th>
-                <th>ใช้งานล่าสุด</th>
-                <th>สถานะ</th>
-                <th>จัดการ</th>
-              </tr>
-            </thead>
-            <tbody id="users-tbody">
-              <tr><td colspan="7"><div class="loading"><div class="spinner"></div> กำลังโหลด...</div></td></tr>
-            </tbody>
-          </table>
-          <div class="pagination" id="users-pagination"></div>
+          <div class="twrap">
+            <table><thead><tr><th>#</th><th>สมาชิก</th><th>เครดิต</th><th>เลขที่</th><th>ใช้งานล่าสุด</th><th>สถานะ</th><th>จัดการ</th></tr></thead>
+            <tbody id="u-tbody"><tr><td colspan="7"><div class="loading"><div class="spin"></div></div></td></tr></tbody></table>
+          </div>
+          <div class="pager" id="u-pager"></div>
         </div>
       </div>
 
-      <!-- ROUNDS PAGE -->
+      <!-- ROUNDS -->
       <div class="page" id="page-rounds">
-        <div class="section-hdr">
-          <h2>รอบการเล่นทั้งหมด</h2>
-          <div class="section-hdr-spacer"></div>
-          <button class="btn-sm" onclick="loadRounds()">
-            <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 8 A6 6 0 1 1 14 8"/><path d="M14 4v4h-4"/></svg>
-            รีเฟรช
-          </button>
+        <div class="shdr"><h2>⚡ รอบการเล่น</h2><div class="shdr-sp"></div>
+          <div style="display:flex;gap:.35rem">
+            <button class="btn bgh" id="rf-all" onclick="setRF('all')">ทั้งหมด</button>
+            <button class="btn bng" id="rf-open" onclick="setRF('open')">เปิดอยู่</button>
+            <button class="btn bgh" id="rf-settled" onclick="setRF('settled')">ปิดแล้ว</button>
+            <button class="btn bgh" onclick="loadRounds()">↺</button>
+          </div>
         </div>
-        <div style="display:flex;gap:.5rem;margin-bottom:1rem">
-          <button class="btn-sm" id="filter-all" onclick="filterRounds('all')" style="background:var(--bg4);border-color:var(--border2)">ทั้งหมด</button>
-          <button class="btn-sm" id="filter-open" onclick="filterRounds('open')">เปิดอยู่</button>
-          <button class="btn-sm" id="filter-settled" onclick="filterRounds('settled')">ปิดแล้ว</button>
-        </div>
-        <div class="rounds-grid" id="rounds-grid">
-          <div class="loading"><div class="spinner"></div> กำลังโหลด...</div>
-        </div>
+        <div class="panel"><div class="twrap">
+          <table><thead><tr><th>ค่าย / ฐาน</th><th>สถานะ</th><th>คู่แทง</th><th>ยอดรวม</th><th>ผล</th><th>เปิดเมื่อ</th><th>ดูคู่</th></tr></thead>
+          <tbody id="r-tbody"></tbody></table>
+        </div></div>
       </div>
 
-      <!-- PROFIT PAGE -->
+      <!-- PROFIT -->
       <div class="page" id="page-profit">
-        <div class="section-hdr">
-          <h2>รายงานกำไร</h2>
-          <div class="section-hdr-spacer"></div>
-          <button class="btn-sm" onclick="loadProfit()">
-            <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 8 A6 6 0 1 1 14 8"/><path d="M14 4v4h-4"/></svg>
-            รีเฟรช
-          </button>
-        </div>
-        <div class="stats-grid" style="margin-bottom:1.5rem">
-          <div class="stat-card yellow">
-            <div class="stat-label">กำไรรวมทั้งหมด</div>
-            <div class="stat-value" id="p-total">—</div>
-            <div class="stat-sub" id="p-updated">—</div>
+        <div class="shdr"><h2>💰 รายงานกำไร</h2><div class="shdr-sp"></div><button class="btn bgh" onclick="loadProfit()">↺ รีเฟรช</button></div>
+        <div style="display:grid;grid-template-columns:240px 1fr;gap:.65rem;margin-bottom:.65rem">
+          <div class="panel"><div class="pbody" style="text-align:center">
+            <div style="font-size:.68rem;color:var(--text2);margin-bottom:.25rem">กำไรรวมทั้งหมด</div>
+            <div style="font-family:'JetBrains Mono',monospace;font-size:2rem;font-weight:700;color:var(--neon)" id="p-total">—</div>
+            <div style="font-size:.65rem;color:var(--text3);margin-top:.2rem" id="p-updated">—</div>
+            <div style="margin-top:.85rem;padding-top:.65rem;border-top:1px solid var(--border)">
+              <div style="font-size:.68rem;color:var(--text2)">จำนวนรอบที่บันทึก</div>
+              <div style="font-family:'JetBrains Mono',monospace;font-size:1.2rem;font-weight:700;color:var(--blue)" id="p-cnt">—</div>
+            </div>
+          </div></div>
+          <div class="panel"><div class="phdr"><h3>กราฟกำไร 50 รอบล่าสุด</h3></div>
+            <div class="pbody"><div style="position:relative;width:100%;height:195px"><canvas id="p-chart" role="img" aria-label="กราฟกำไร">กราฟ</canvas></div></div>
           </div>
         </div>
-        <div class="chart-card" style="margin-bottom:1.5rem">
-          <h3>กำไรแต่ละรอบ (50 รอบล่าสุด)</h3>
-          <div style="position:relative;width:100%;height:260px">
-            <canvas id="profit-chart2" role="img" aria-label="กราฟกำไรรอบล่าสุด 50 รอบ">กราฟกำไร</canvas>
+        <div class="panel"><div class="twrap">
+          <table><thead><tr><th>รอบ ID</th><th>ค่าย</th><th>กำไร</th><th>เวลาปิด</th></tr></thead>
+          <tbody id="p-tbody"></tbody></table>
+        </div></div>
+      </div>
+
+      <!-- SYSTEM -->
+      <div class="page" id="page-system">
+        <div class="shdr"><h2>⚙️ จัดการระบบ</h2><div class="shdr-sp"></div><button class="btn bgh" onclick="loadSysInfo()">↺ รีเฟรช</button></div>
+
+        <!-- System Info -->
+        <div class="panel" style="margin-bottom:.75rem">
+          <div class="phdr"><span>📊</span><h3>ข้อมูลระบบ</h3><span class="tag tg" id="sys-status">กำลังโหลด...</span></div>
+          <div class="pbody">
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:.65rem" id="sys-info-grid">
+              <div class="loading"><div class="spin"></div></div>
+            </div>
           </div>
         </div>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr><th>รอบ</th><th>กำไร</th><th>เวลา</th><th>ค่าย</th></tr>
-            </thead>
-            <tbody id="profit-tbody"></tbody>
-          </table>
+
+        <!-- Action Buttons -->
+        <div class="sys-grid">
+
+          <!-- ล้างออเดอร์ -->
+          <div class="sys-card warning">
+            <div class="sys-card-icon">🧹</div>
+            <div class="sys-card-title">ล้างออเดอร์</div>
+            <div class="sys-card-desc">ล้างบิลทั้งหมด คืนเครดิตบิลที่ยัง matched อยู่ และเริ่มเลขออเดอร์ใหม่</div>
+            <div class="sys-info">
+              <div>บิล matched รอผล: <strong id="si-pending">—</strong></div>
+              <div>ออเดอร์ทั้งหมด: <strong id="si-total-match">—</strong></div>
+            </div>
+            <div style="display:flex;gap:.5rem;align-items:center;margin-bottom:.5rem">
+              <span style="font-size:.72rem;color:var(--text2)">เริ่มเลขออเดอร์ที่:</span>
+              <input type="number" id="reset-order-no" value="1" min="1" style="width:70px;padding:.3rem .5rem;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius);color:var(--text);font-family:'JetBrains Mono',monospace;font-size:.82rem;outline:none">
+            </div>
+            <button class="btn bor" style="width:100%;justify-content:center" onclick="confirmSysAction('reset-orders','ล้างออเดอร์ทั้งหมด','⚠️ คืนเครดิตบิลที่ค้างอยู่ก่อน แล้วล้างออเดอร์ทั้งหมด ยืนยัน?')">🧹 ล้างออเดอร์</button>
+          </div>
+
+          <!-- ล้างกำไร -->
+          <div class="sys-card danger">
+            <div class="sys-card-icon">💸</div>
+            <div class="sys-card-title">ล้างกำไร (Reset)</div>
+            <div class="sys-card-desc">รีเซ็ตยอดกำไรสะสมและประวัติรอบกำไรทั้งหมดเป็น 0</div>
+            <div class="sys-info">
+              <div>กำไรปัจจุบัน: <strong id="si-profit" style="color:var(--neon)">—</strong></div>
+              <div>จำนวนรอบ: <strong id="si-profit-rounds">—</strong></div>
+            </div>
+            <div style="height:.5rem"></div>
+            <button class="btn brd" style="width:100%;justify-content:center" onclick="confirmSysAction('reset-profit','ล้างกำไร','⛔ รีเซ็ตยอดกำไรและประวัติทั้งหมดเป็น 0 ยืนยัน?')">💸 ล้างกำไร</button>
+          </div>
+
+          <!-- ล้าง round_backups -->
+          <div class="sys-card">
+            <div class="sys-card-icon">🗑️</div>
+            <div class="sys-card-title">ล้าง Round Backups</div>
+            <div class="sys-card-desc">ลบไฟล์สำรองรอบเก่าในโฟลเดอร์ round_backups ไม่กระทบข้อมูลใน memory</div>
+            <div class="sys-info">
+              <div>ไฟล์ backup: <strong id="si-backup-cnt">—</strong> ไฟล์</div>
+              <div>ขนาดรวม: <strong id="si-backup-size">—</strong> KB</div>
+            </div>
+            <div style="height:.5rem"></div>
+            <button class="btn bbl" style="width:100%;justify-content:center" onclick="confirmSysAction('clear-round-backups','ล้าง Round Backups','ลบไฟล์ backup รอบเก่าทั้งหมด ยืนยัน?')">🗑️ ล้าง Backups</button>
+          </div>
+
+        </div>
+
+        <!-- Result log -->
+        <div class="panel" id="sys-result-panel" style="display:none">
+          <div class="phdr"><span>📋</span><h3>ผลการดำเนินการ</h3><button class="btn bgh" onclick="$('sys-result-panel').style.display='none'" style="padding:.2rem .5rem;font-size:.7rem">ปิด</button></div>
+          <div class="pbody"><div class="result-box" id="sys-result-box"></div></div>
         </div>
       </div>
-    </main>
+
+      <!-- ADMINS -->
+      <div class="page" id="page-admins">
+        <div class="shdr"><h2>⭐ จัดการแอดมิน</h2><div class="shdr-sp"></div><button class="btn bng" onclick="openAddAdminModal()">+ เพิ่มแอดมิน</button><button class="btn bgh" onclick="loadAdmins()" style="margin-left:.4rem">↺ รีเฟรช</button></div>
+
+        <div class="g2" style="margin-bottom:.75rem">
+          <div class="panel">
+            <div class="phdr"><span>🌟</span><h3>แอดมินจาก .env</h3><span class="tag tg">ถาวร</span></div>
+            <div class="pbody" style="padding:.5rem .75rem"><div id="env-admins-list"><div class="loading"><div class="spin"></div></div></div></div>
+          </div>
+          <div class="panel">
+            <div class="phdr"><span>⚡</span><h3>แอดมินจากคำสั่ง</h3><span class="tag tb_">Dynamic</span></div>
+            <div class="pbody" style="padding:.5rem .75rem"><div id="dyn-admins-list"><div class="loading"><div class="spin"></div></div></div></div>
+          </div>
+        </div>
+
+        <!-- เพิ่มแอดมินจาก user list -->
+        <div class="panel">
+          <div class="phdr"><span>👤</span><h3>เพิ่มแอดมินจากรายชื่อสมาชิก</h3></div>
+          <div class="toolbar">
+            <input type="search" class="sbox" id="adm-search" placeholder="ค้นหาสมาชิก..." oninput="debAdmSearch()">
+            <button class="btn bgh" onclick="loadAdmUsers()">↺ รีเฟรช</button>
+          </div>
+          <div class="twrap">
+            <table><thead><tr><th>สมาชิก</th><th>เครดิต</th><th>สถานะ</th><th>จัดการ</th></tr></thead>
+            <tbody id="adm-u-tbody"><tr><td colspan="4"><div class="loading"><div class="spin"></div></div></td></tr></tbody></table>
+          </div>
+        </div>
+      </div>
+
+    </div>
   </div>
 </div>
 
-<!-- User Detail Modal -->
-<div class="modal-bg" id="user-modal">
+<!-- MODALS -->
+<div class="modal-bg" id="m-user">
   <div class="modal">
-    <div class="modal-hdr">
-      <h3 id="modal-user-title">รายละเอียดสมาชิก</h3>
-      <button class="modal-close" onclick="closeModal('user-modal')">✕</button>
-    </div>
-    <div class="modal-body" id="modal-user-body">
-      <div class="loading"><div class="spinner"></div> กำลังโหลด...</div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn-sm" onclick="closeModal('user-modal')">ปิด</button>
-    </div>
+    <div class="mhdr"><h3 id="m-user-title">รายละเอียดสมาชิก</h3><button class="mx" onclick="closeMod('m-user')">✕</button></div>
+    <div class="mbody" id="m-user-body"><div class="loading"><div class="spin"></div></div></div>
+    <div class="mfoot"><button class="btn bgh" onclick="closeMod('m-user')">ปิด</button></div>
   </div>
 </div>
-
-<!-- Credit Modal -->
-<div class="modal-bg" id="credit-modal">
+<div class="modal-bg" id="m-credit">
   <div class="modal">
-    <div class="modal-hdr">
-      <h3 id="credit-modal-title">ปรับเครดิต</h3>
-      <button class="modal-close" onclick="closeModal('credit-modal')">✕</button>
+    <div class="mhdr"><h3 id="m-credit-title">ปรับเครดิต</h3><button class="mx" onclick="closeMod('m-credit')">✕</button></div>
+    <div class="mbody">
+      <div class="frow"><label>User ID</label><input type="text" id="c-uid" placeholder="User ID..."></div>
+      <div class="frow"><label>จำนวน (ใส่ลบได้ เช่น -100)</label><input type="number" id="c-amt" placeholder="0"></div>
+      <div class="frow"><label>เหตุผล</label><input type="text" id="c-reason" placeholder="admin_dashboard"></div>
+      <div class="frow"><label>ประเภท</label><select id="c-type"><option value="adjust">+/- ปรับ</option><option value="set">= ตั้งค่าตรงๆ</option></select></div>
     </div>
-    <div class="modal-body">
-      <div class="form-row">
-        <label>User ID</label>
-        <input type="text" id="credit-uid" placeholder="User ID...">
-      </div>
-      <div class="form-row">
-        <label>จำนวน (ใส่ลบได้ เช่น -100)</label>
-        <input type="number" id="credit-amount" placeholder="0">
-      </div>
-      <div class="form-row">
-        <label>เหตุผล</label>
-        <input type="text" id="credit-reason" placeholder="admin_dashboard">
-      </div>
-      <div class="form-row">
-        <label>ประเภท</label>
-        <select id="credit-type">
-          <option value="adjust">+/- (ปรับ)</option>
-          <option value="set">= (ตั้งค่าตรงๆ)</option>
-        </select>
-      </div>
+    <div class="mfoot"><button class="btn bgh" onclick="closeMod('m-credit')">ยกเลิก</button><button class="btn bng" onclick="submitCredit()">💾 บันทึก</button></div>
+  </div>
+</div>
+<div class="modal-bg" id="m-round">
+  <div class="modal" style="width:580px">
+    <div class="mhdr"><h3 id="m-round-title">รายละเอียดรอบ</h3><button class="mx" onclick="closeMod('m-round')">✕</button></div>
+    <div class="mbody" id="m-round-body"><div class="loading"><div class="spin"></div></div></div>
+    <div class="mfoot"><button class="btn bgh" onclick="closeMod('m-round')">ปิด</button></div>
+  </div>
+</div>
+<div class="modal-bg" id="m-confirm">
+  <div class="modal" style="width:400px">
+    <div class="mhdr"><h3 id="m-confirm-title">ยืนยัน</h3><button class="mx" onclick="closeMod('m-confirm')">✕</button></div>
+    <div class="mbody">
+      <div class="confirm-box" id="m-confirm-msg"></div>
+      <div style="font-size:.78rem;color:var(--text2)">การดำเนินการนี้ไม่สามารถย้อนกลับได้</div>
     </div>
-    <div class="modal-footer">
-      <button class="btn-sm" onclick="closeModal('credit-modal')">ยกเลิก</button>
-      <button class="btn-sm primary" onclick="submitCredit()">บันทึก</button>
+    <div class="mfoot">
+      <button class="btn bgh" onclick="closeMod('m-confirm')">ยกเลิก</button>
+      <button class="btn brd" id="m-confirm-btn">✓ ยืนยัน</button>
     </div>
   </div>
 </div>
-
-<!-- Round Detail Modal -->
-<div class="modal-bg" id="round-modal">
-  <div class="modal" style="width:600px">
-    <div class="modal-hdr">
-      <h3 id="round-modal-title">รายละเอียดรอบ</h3>
-      <button class="modal-close" onclick="closeModal('round-modal')">✕</button>
+<div class="modal-bg" id="m-add-admin">
+  <div class="modal" style="width:400px">
+    <div class="mhdr"><h3>เพิ่มแอดมินด้วย User ID</h3><button class="mx" onclick="closeMod('m-add-admin')">✕</button></div>
+    <div class="mbody">
+      <div class="frow"><label>User ID (LINE)</label><input type="text" id="adm-uid" placeholder="U1234567890..."></div>
     </div>
-    <div class="modal-body" id="round-modal-body">
-      <div class="loading"><div class="spinner"></div> กำลังโหลด...</div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn-sm" onclick="closeModal('round-modal')">ปิด</button>
-    </div>
+    <div class="mfoot"><button class="btn bgh" onclick="closeMod('m-add-admin')">ยกเลิก</button><button class="btn bng" onclick="submitAddAdmin()">+ เพิ่มแอดมิน</button></div>
   </div>
 </div>
 
 <div class="toast-wrap" id="toasts"></div>
-
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script>
-let BASE_URL = '', TOKEN = '', profitChart = null, profitChart2 = null;
-let currentPage = 1, totalPages = 1, userSearchTimer = null, roundsData = [], roundsFilter = 'all';
-let sseSource = null;
+let BASE='',TOK='',sseConn=null,ovChart=null,pChart=null;
+let uPage=1,uPages=1,uSearchT=null,allRounds=[],rf='open',admSearchT=null;
+const $=id=>document.getElementById(id);
+const fmt=n=>(n||0).toLocaleString('th-TH');
+const fmtD=s=>{if(!s||s==='-')return '-';try{return new Date(s).toLocaleString('th-TH',{dateStyle:'short',timeStyle:'short'})}catch{return s}};
+const esc=s=>String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
-function $(id){return document.getElementById(id)}
-function fmt(n){return (n||0).toLocaleString('th-TH')}
-function fmtDate(s){if(!s||s==='-')return '-';try{return new Date(s).toLocaleString('th-TH',{dateStyle:'short',timeStyle:'short'})}catch{return s}}
+// ========== SAVED ACCOUNTS ==========
+const STORAGE_KEY='bot_accounts';
+function getSavedAccounts(){try{return JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]')}catch{return[]}}
+function saveAccount(url,tok,nick){
+  const list=getSavedAccounts().filter(a=>a.url!==url||a.tok!==tok);
+  list.unshift({url,tok:tok,nick:nick||url.replace(/https?:\/\//,'').substring(0,20),savedAt:Date.now()});
+  localStorage.setItem(STORAGE_KEY,JSON.stringify(list.slice(0,5)));
+}
+function deleteSaved(idx){const list=getSavedAccounts();list.splice(idx,1);localStorage.setItem(STORAGE_KEY,JSON.stringify(list));renderSavedList()}
+function renderSavedList(){
+  const list=getSavedAccounts();const wrap=$('saved-accounts');const listEl=$('saved-list');
+  if(!list.length){wrap.style.display='none';return}
+  wrap.style.display='block';
+  listEl.innerHTML=list.map((a,i)=>`
+    <div class="saved-item" onclick="fillLogin(${i})">
+      <div class="saved-item-info">
+        <div class="saved-item-url">${esc(a.nick||a.url)}</div>
+        <div class="saved-item-nick" style="font-family:'JetBrains Mono',monospace">${esc(a.url.replace(/https?:\/\//,'').substring(0,30))}</div>
+      </div>
+      <button class="saved-del" onclick="event.stopPropagation();deleteSaved(${i})" title="ลบ">✕</button>
+    </div>`).join('');
+}
+function fillLogin(idx){
+  const a=getSavedAccounts()[idx];if(!a)return;
+  $('li-url').value=a.url;$('li-tok').value=a.tok;$('li-nick').value=a.nick||'';
+}
 
-// ============ AUTH ============
+// ========== AUTH ==========
 function doLogin(){
-  const url=($('login-url').value||'').replace(/\/+$/,'');
-  const tok=$('login-token').value.trim();
-  if(!url||!tok){$('login-error').style.display='block';return}
-  BASE_URL=url;TOKEN=tok;
-  $('login-error').style.display='none';
+  const url=($('li-url').value||'').replace(/\/+$/,''),tok=$('li-tok').value.trim(),nick=($('li-nick').value||'').trim();
+  if(!url||!tok){$('li-err').style.display='block';return}
+  BASE=url;TOK=tok;$('li-err').style.display='none';
+  if($('li-remember').checked)saveAccount(url,tok,nick);
   testAuth();
 }
 async function testAuth(){
-  try{
-    const r=await apiFetch('/dashboard/api/users?per_page=1');
-    if(r.ok){
-      sessionStorage.setItem('bot_url',BASE_URL);
-      sessionStorage.setItem('bot_tok',TOKEN);
-      showApp();
-    }else{$('login-error').style.display='block'}
-  }catch{$('login-error').style.display='block'}
+  try{const r=await api('/dashboard/api/users?per_page=1');if(r.ok){sessionStorage.setItem('bu',BASE);sessionStorage.setItem('bt',TOK);showApp()}else{$('li-err').style.display='block'}}
+  catch{$('li-err').style.display='block'}
 }
-function logout(){
-  if(sseSource)sseSource.close();
-  sessionStorage.clear();BASE_URL='';TOKEN='';
-  $('app').style.display='none';
-  $('login-overlay').style.display='flex';
-}
-function showApp(){
-  $('login-overlay').style.display='none';
-  $('app').style.display='block';
-  startClock();startSSE();navigate('overview');loadRounds();
-}
+function logout(){if(sseConn)sseConn.close();sessionStorage.clear();BASE='';TOK='';$('app').style.display='none';$('login-overlay').style.display='flex'}
+function showApp(){$('login-overlay').style.display='none';$('app').style.display='block';startClock();startSSE();loadAll()}
+function loadAll(){loadOverview();loadRounds()}
 
-// ============ API ============
-async function apiFetch(path,opts={}){
-  const url=BASE_URL+path;
-  const headers={'Content-Type':'application/json','X-Dashboard-Token':TOKEN,...(opts.headers||{})};
-  const res=await fetch(url,{...opts,headers});
+// ========== API ==========
+async function api(path,opts={}){
+  const res=await fetch(BASE+path,{...opts,headers:{'Content-Type':'application/json','X-Dashboard-Token':TOK,...(opts.headers||{})}});
   if(res.status===401)throw new Error('Unauthorized');
   return res.json();
 }
 
-// ============ SSE ============
+// ========== SSE ==========
 function startSSE(){
-  if(sseSource){sseSource.close()}
-  const url=BASE_URL+'/dashboard/api/stream?token='+encodeURIComponent(TOKEN);
+  if(sseConn)sseConn.close();
   try{
-    sseSource=new EventSource(url);
-    sseSource.onmessage=e=>{
-      try{const d=JSON.parse(e.data);if(!d.error)updateStats(d)}catch{}
-    };
-    sseSource.onerror=()=>{
-      sseSource.close();
-      setTimeout(startSSE,5000);
-    };
-  }catch{
-    // Fallback: poll every 5s
-    setInterval(pollStats,5000);
-    pollStats();
-  }
+    sseConn=new EventSource(BASE+'/dashboard/api/stream?token='+encodeURIComponent(TOK));
+    sseConn.onmessage=e=>{try{const d=JSON.parse(e.data);if(!d.error)applyStats(d)}catch{}};
+    sseConn.onerror=()=>{sseConn.close();setTimeout(startSSE,6000)};
+  }catch{setInterval(()=>api('/dashboard/api/summary').then(d=>{if(d.ok)applyStats(d.data)}).catch(()=>{}),5000)}
 }
-async function pollStats(){
-  try{
-    const [pu,pp]=await Promise.all([apiFetch('/dashboard/api/users?per_page=1'),apiFetch('/dashboard/api/profit')]);
-    const d={
-      total_users:pu.meta?.total||0,
-      total_profit:pp.data?.total_profit||0,
-    };
-    updateStats(d);
-  }catch{}
-}
-function updateStats(d){
-  if(d.total_users!==undefined)$('s-total-users').textContent=fmt(d.total_users);
-  if(d.active_users!==undefined)$('s-active-users').textContent='มีเครดิต '+fmt(d.active_users)+' คน';
-  if(d.open_rounds!==undefined){$('s-open-rounds').textContent=fmt(d.open_rounds);$('open-rounds-count').textContent=fmt(d.open_rounds)+' รอบ'}
-  if(d.total_credit!==undefined)$('s-total-credit').textContent=fmt(d.total_credit);
-  if(d.total_profit!==undefined)$('s-total-profit').textContent=fmt(d.total_profit);
-  if(d.total_bets!==undefined)$('s-total-bets').textContent=fmt(d.total_bets);
+function applyStats(d){
+  const now=new Date().toLocaleString('th-TH',{dateStyle:'short',timeStyle:'medium'});
+  $('tb-sub').textContent='อัปเดต: '+now+' • ระบบบอทออนไลน์';
+  if(d.total_users!==undefined)$('s-users').textContent=fmt(d.total_users);
+  if(d.active_users!==undefined){$('s-active').textContent='ACTIVE: '+fmt(d.active_users)+' รายการ';$('active-tag').textContent=fmt(d.active_users)+' ออนไลน์'}
+  if(d.open_rounds!==undefined)$('s-open').textContent='รอปิด/ยืนยัน: '+fmt(d.open_rounds);
+  if(d.total_bets!==undefined||d.total_betting!==undefined){const v=d.total_bets||d.total_betting||0;$('s-bets').textContent=fmt(v);$('ov-total-bet').textContent=fmt(v)}
+  if(d.total_profit!==undefined){$('s-profit').textContent=fmt(d.total_profit);$('ov-profit').textContent=fmt(d.total_profit)}
+  if(d.total_rounds_ever!==undefined)$('s-rounds').textContent=fmt(d.total_rounds_ever);
+  if(d.profit_rounds!==undefined)$('ov-profit-rounds').textContent=fmt(d.profit_rounds)+' รอบ';
   if(d.top5)renderTop5(d.top5);
 }
+function startClock(){const t=()=>$('clock').textContent=new Date().toLocaleTimeString('th-TH');t();setInterval(t,1000)}
 
-// ============ CLOCK ============
-function startClock(){
-  function tick(){$('clock').textContent=new Date().toLocaleTimeString('th-TH')}
-  tick();setInterval(tick,1000);
+// ========== NAVIGATION ==========
+function goPage(p){
+  document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(x=>x.classList.remove('active'));
+  $('page-'+p).classList.add('active');
+  const lbl={overview:'Dashboard',users:'สมาชิก',rounds:'รอบ',profit:'กำไร',system:'จัดการ',admins:'แอดมิน'};
+  document.querySelectorAll('.nav-btn').forEach(x=>{if(x.textContent.trim().startsWith(lbl[p]||'__'))x.classList.add('active')});
+  if(p==='users')loadUsers();if(p==='rounds')loadRounds();if(p==='profit')loadProfit();
+  if(p==='system')loadSysInfo();if(p==='admins'){loadAdmins();loadAdmUsers();}
 }
 
-// ============ NAVIGATION ============
-function navigate(page){
-  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
-  $('page-'+page).classList.add('active');
-  document.querySelectorAll('.nav-item').forEach(n=>{if(n.textContent.trim().includes(pageLabel(page)))n.classList.add('active')});
-  if(page==='users')loadUsers();
-  if(page==='rounds')loadRounds();
-  if(page==='profit')loadProfit();
-  if(page==='overview')loadOverview();
-}
-function pageLabel(p){return{overview:'ภาพรวม',users:'สมาชิก',rounds:'รอบ',profit:'กำไร'}[p]||''}
-
-// ============ OVERVIEW ============
+// ========== OVERVIEW ==========
 async function loadOverview(){
-  loadRoundsForOverview();loadProfit();
-}
-async function loadRoundsForOverview(){
   try{
-    const d=await apiFetch('/dashboard/api/rounds');
-    const open=(d.data||[]).filter(r=>r.opened&&!r.settled).slice(0,6);
-    const el=$('overview-rounds');
-    if(!open.length){el.innerHTML='<div class="empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg><div>ไม่มีรอบที่เปิดอยู่</div></div>';return}
-    el.innerHTML=open.map(r=>roundCardHtml(r)).join('');
-  }catch(e){$('overview-rounds').innerHTML='<div class="empty">โหลดข้อมูลไม่ได้</div>'}
+    const [pr,rr]=await Promise.all([api('/dashboard/api/profit'),api('/dashboard/api/rounds')]);
+    if(pr.ok){const p=pr.data;$('s-profit').textContent=fmt(p.total_profit);$('ov-profit').textContent=fmt(p.total_profit);$('ov-profit-rounds').textContent=fmt((p.rounds||[]).length)+' รอบ';const rds=(p.rounds||[]).slice(0,50).reverse();drawOvChart(rds);renderOvBets(rds);}
+    if(rr.ok){const open=(rr.data||[]).filter(x=>x.opened&&!x.settled);$('s-rounds').textContent=fmt((rr.data||[]).length);$('s-open').textContent='รอปิด/ยืนยัน: '+fmt(open.length);renderOvRounds(open.slice(0,4));}
+  }catch(e){console.error(e)}
 }
+function renderTop5(list){const rc=['r1','r2','r3','rn','rn'];$('top5').innerHTML=list.map((u,i)=>`<div class="mrow"><div class="mrank ${rc[i]||'rn'}">${i+1}</div><div class="minfo"><div class="mname">${esc(u.name||u.user_id)}</div><div class="mid_">${(u.user_id||'').substring(0,12)}...</div></div><div style="text-align:right"><div class="${(u.credit||0)===0?'mcredit0':'mcredit'}">${fmt(u.credit||0)}</div><div style="font-size:.6rem;color:var(--text3)">เครดิต</div></div></div>`).join('')}
+function renderOvRounds(rounds){
+  if(!rounds.length){$('ov-rounds').innerHTML='<div class="empty">ไม่มีรอบที่เปิดอยู่</div>';return}
+  $('ov-rounds').innerHTML=rounds.map(r=>`<div class="rmini open" onclick="openRoundDet('${esc(r.round_id||r.base_no)}','${esc(r.camp_name||r.base_no)}')"><div class="rmini-top"><span class="rname">${esc(r.camp_name||r.base_no)}</span><span class="badge bg_">● เปิดอยู่</span></div><div class="rstats"><span>ค่าย <span class="rv">${esc(r.camp_name||'-')}</span></span><span>คู่ <span class="rv">${fmt(r.match_count||0)}</span></span><span>ยอด <span class="rv" style="color:var(--yellow)">${fmt(r.total_amount||0)}</span></span></div></div>`).join('');
+}
+function renderOvBets(rounds){const last3=rounds.slice(-3).reverse();$('ov-bets').innerHTML=last3.length?last3.map(r=>`<div style="display:flex;align-items:center;gap:.55rem;padding:.45rem 0;border-bottom:1px solid var(--border)"><div style="flex:1;min-width:0"><div style="font-size:.78rem;font-weight:600">${esc(r.camp_name||r.round_id||'-')}</div><div style="font-size:.65rem;color:var(--text3)">รอบ: ${(r.round_id||'-').substring(0,8)}...</div></div><span class="badge bg_">ปิดแล้ว</span><div style="text-align:right"><div style="font-family:'JetBrains Mono',monospace;font-size:.82rem;font-weight:700;color:var(--yellow)">${fmt(r.profit||0)}</div><div style="font-size:.6rem;color:var(--text3)">กำไร</div></div></div>`).join(''):'<div class="empty">ไม่มีข้อมูล</div>'}
+function drawOvChart(rounds){const ctx=$('ov-chart')?.getContext('2d');if(!ctx)return;if(ovChart)ovChart.destroy();const data=rounds.map(r=>r.profit||0);ovChart=new Chart(ctx,{type:'bar',data:{labels:rounds.map((_,i)=>i+1),datasets:[{data,backgroundColor:data.map(v=>v>=0?'#00ff8840':'#ff444440'),borderColor:data.map(v=>v>=0?'#00ff88':'#ff4444'),borderWidth:1,borderRadius:2}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{display:false},y:{ticks:{color:'#3d5166',font:{size:8},callback:v=>fmt(v)},grid:{color:'#1e2d3d'}}}}})}
 
-// ============ USERS ============
-let allUsers=[];
+// ========== USERS ==========
 async function loadUsers(){
-  const q=$('user-search').value.trim();
-  const sort=$('user-sort').value;
-  try{
-    $('users-tbody').innerHTML='<tr><td colspan="7"><div class="loading"><div class="spinner"></div> กำลังโหลด...</div></td></tr>';
-    const d=await apiFetch(`/dashboard/api/users?q=${encodeURIComponent(q)}&sort=${sort}&order=desc&page=${currentPage}&per_page=50`);
-    allUsers=d.data||[];
-    totalPages=d.meta?.pages||1;
-    $('users-count-badge').textContent=fmt(d.meta?.total||0)+' คน';
-    renderUsersTable(allUsers);
-    renderPagination(d.meta);
-  }catch(e){$('users-tbody').innerHTML='<tr><td colspan="7"><div class="empty">โหลดข้อมูลไม่ได้: '+e.message+'</div></td></tr>'}
+  const q=$('u-search').value.trim(),sort=$('u-sort').value;
+  $('u-tbody').innerHTML='<tr><td colspan="7"><div class="loading"><div class="spin"></div></div></td></tr>';
+  try{const d=await api(`/dashboard/api/users?q=${encodeURIComponent(q)}&sort=${sort}&order=desc&page=${uPage}&per_page=50`);$('users-cnt').textContent=fmt(d.meta?.total||0)+' คน';uPages=d.meta?.pages||1;renderUsers(d.data||[]);renderPager(d.meta);}
+  catch(e){$('u-tbody').innerHTML='<tr><td colspan="7"><div class="empty">โหลดไม่ได้: '+e.message+'</div></td></tr>'}
 }
-function debounceUserSearch(){
-  clearTimeout(userSearchTimer);
-  currentPage=1;
-  userSearchTimer=setTimeout(loadUsers,400);
+function debSearch(){clearTimeout(uSearchT);uPage=1;uSearchT=setTimeout(loadUsers,380)}
+function renderUsers(users){
+  if(!users.length){$('u-tbody').innerHTML='<tr><td colspan="7"><div class="empty">ไม่พบสมาชิก</div></td></tr>';return}
+  const pal=[['#00ff8825','#00ff88'],['#00b4ff25','#00b4ff'],['#a855f725','#a855f7'],['#ff8c0025','#ff8c00'],['#ffd70025','#ffd700']];
+  $('u-tbody').innerHTML=users.map((u,i)=>{const cr=u.credit||0;const p=pal[i%pal.length];const init=(u.name||'?').substring(0,2).toUpperCase();const cc=cr>1000?'var(--neon)':cr>100?'var(--yellow)':'var(--text2)';
+    return `<tr><td class="mono" style="color:var(--text3)">${u.member_no||'-'}</td><td><div style="display:flex;align-items:center;gap:.55rem"><div class="av" style="background:${p[0]};color:${p[1]};border:1px solid ${p[1]}44">${init}</div><div><div style="font-weight:600;font-size:.78rem">${esc(u.name||u.user_id)}</div><div class="mono" style="color:var(--text3)">${(u.user_id||'').substring(0,13)}...</div></div></div></td>
+    <td><span style="font-family:'JetBrains Mono',monospace;font-weight:700;color:${cc}">${fmt(cr)}</span></td>
+    <td style="color:var(--text2)">#${u.member_no||'-'}</td><td style="color:var(--text3);font-size:.7rem">${fmtD(u.last_seen_at)}</td>
+    <td>${cr>0?'<span class="badge bg_">● มีเครดิต</span>':'<span class="badge bgr">○ ไม่มี</span>'}</td>
+    <td><div style="display:flex;gap:.28rem"><button class="abtn" onclick="openUserDet('${esc(u.user_id)}')">ดู</button><button class="abtn" onclick="openCreditModal('${esc(u.user_id)}','${esc(u.name||'')}')">เครดิต</button><button class="abtn d" onclick="delUser('${esc(u.user_id)}','${esc(u.name||'')}',${cr})">ลบ</button></div></td></tr>`}).join('');
 }
-function renderUsersTable(users){
-  if(!users.length){
-    $('users-tbody').innerHTML='<tr><td colspan="7"><div class="empty">ไม่พบสมาชิก</div></td></tr>';
-    return;
-  }
-  $('users-tbody').innerHTML=users.map((u,i)=>{
-    const cr=u.credit||0;
-    const crClass=cr>1000?'high':cr>100?'mid':'low';
-    const colors=['#6e40aa','#ef5675','#ff764a','#ffa600','#0d88e6','#1aff1a','#00b7c7'];
-    const bg=colors[(u.member_no||i)%colors.length]+'33';
-    const tc=colors[(u.member_no||i)%colors.length];
-    const initials=(u.name||'?').substring(0,2).toUpperCase();
-    return `<tr>
-      <td style="color:var(--text3);font-size:.75rem">${u.member_no||'-'}</td>
-      <td>
-        <div style="display:flex;align-items:center;gap:.6rem">
-          <div class="avatar" style="background:${bg};color:${tc}">${initials}</div>
-          <div>
-            <div style="font-weight:500;font-size:.85rem">${esc(u.name||u.user_id)}</div>
-            <div class="mono" style="color:var(--text3);font-size:.7rem">${u.user_id.substring(0,16)}...</div>
-          </div>
-        </div>
-      </td>
-      <td><span class="credit-num ${crClass}">${fmt(cr)}</span></td>
-      <td style="color:var(--text2)">#${u.member_no||'-'}</td>
-      <td style="color:var(--text3);font-size:.78rem">${fmtDate(u.last_seen_at)}</td>
-      <td>${cr>0?'<span class="badge-pill badge-green">● มีเครดิต</span>':'<span class="badge-pill badge-gray">○ ไม่มีเครดิต</span>'}</td>
-      <td>
-        <div style="display:flex;gap:.4rem">
-          <button class="action-btn" onclick="openUserDetail('${u.user_id}')">ดู</button>
-          <button class="action-btn" onclick="openCreditModal('${u.user_id}','${esc(u.name||'')}')">เครดิต</button>
-          <button class="action-btn danger" onclick="confirmDeleteUser('${u.user_id}','${esc(u.name||'')}',${cr})">ลบ</button>
-        </div>
-      </td>
-    </tr>`
-  }).join('');
-}
-function renderPagination(meta){
-  if(!meta){$('users-pagination').innerHTML='';return}
-  const {page,pages,total,per_page}=meta;
-  const start=((page-1)*per_page)+1;
-  const end=Math.min(page*per_page,total);
-  $('users-pagination').innerHTML=`
-    <span style="flex:1;color:var(--text2)">${start}–${end} จาก ${fmt(total)} รายการ</span>
-    <button class="page-btn" onclick="changePage(${page-1})" ${page<=1?'disabled':''}>‹</button>
-    ${[...Array(Math.min(5,pages))].map((_,i)=>{
-      const p=Math.max(1,Math.min(pages-4,page-2))+i;
-      return p<=pages?`<button class="page-btn ${p===page?'active':''}" onclick="changePage(${p})">${p}</button>`:''
-    }).join('')}
-    <button class="page-btn" onclick="changePage(${page+1})" ${page>=pages?'disabled':''}>›</button>
-  `;
-}
-function changePage(p){currentPage=p;loadUsers()}
+function renderPager(meta){if(!meta){$('u-pager').innerHTML='';return}const{page,pages,total,per_page}=meta;const s=((page-1)*per_page)+1,e=Math.min(page*per_page,total);$('u-pager').innerHTML=`<span style="color:var(--text2);font-size:.7rem">${s}–${e} จาก ${fmt(total)}</span><div class="pgr-sp"></div><button class="pbtn" onclick="uGo(${page-1})" ${page<=1?'disabled':''}>‹</button>${[...Array(Math.min(5,pages))].map((_,i)=>{const p=Math.max(1,Math.min(pages-4,page-2))+i;return p<=pages?`<button class="pbtn ${p===page?'active':''}" onclick="uGo(${p})">${p}</button>`:''}).join('')}<button class="pbtn" onclick="uGo(${page+1})" ${page>=pages?'disabled':''}>›</button>`}
+function uGo(p){uPage=p;loadUsers()}
 
-// ============ USER DETAIL ============
-async function openUserDetail(uid){
-  $('modal-user-title').textContent='โหลดข้อมูล...';
-  $('modal-user-body').innerHTML='<div class="loading"><div class="spinner"></div> กำลังโหลด...</div>';
-  openModal('user-modal');
-  try{
-    const d=await apiFetch('/dashboard/api/users/'+encodeURIComponent(uid));
-    const u=d.data;
-    $('modal-user-title').textContent=u.name||u.user_id;
-    const matches=u.matches||[];
-    $('modal-user-body').innerHTML=`
-      <div class="user-detail-grid">
-        <div class="detail-item"><label>User ID</label><div class="mono" style="font-size:.75rem;word-break:break-all">${esc(u.user_id)}</div></div>
-        <div class="detail-item"><label>ชื่อ</label><div style="font-weight:600">${esc(u.name||'-')}</div></div>
-        <div class="detail-item"><label>เลขสมาชิก</label><div>#${u.member_no||'-'}</div></div>
-        <div class="detail-item"><label>เครดิตปัจจุบัน</label><div class="credit-num ${(u.credit||0)>1000?'high':(u.credit||0)>100?'mid':'low'}" style="font-size:1.2rem">${fmt(u.credit||0)}</div></div>
-        <div class="detail-item"><label>ใช้งานล่าสุด</label><div style="font-size:.8rem">${fmtDate(u.last_seen_at)}</div></div>
-        <div class="detail-item"><label>สมัครเมื่อ</label><div style="font-size:.8rem">${fmtDate(u.created_at)}</div></div>
-      </div>
-      <div style="margin:.75rem 0 .5rem;font-size:.8rem;font-weight:600;color:var(--text2)">ประวัติการแทง (20 รายการล่าสุด)</div>
-      ${matches.length?`<table class="matches-mini-table">
-        <tr><th>รอบ</th><th>ค่าย</th><th>ฝั่ง</th><th>จำนวน</th><th>สถานะ</th></tr>
-        ${matches.map(m=>`<tr>
-          <td class="mono" style="font-size:.7rem">${(m.round_id||'-').substring(0,8)}...</td>
-          <td>${esc(m.camp_name||'-')}</td>
-          <td>${m.side==='maker'?'<span class="badge-pill badge-blue">maker</span>':'<span class="badge-pill badge-purple">taker</span>'}</td>
-          <td><span class="credit-num mid">${fmt(m.amount)}</span></td>
-          <td>${statusBadge(m.status)}</td>
-        </tr>`).join('')}
-      </table>`:'<div style="color:var(--text3);font-size:.8rem;padding:.5rem 0">ไม่มีประวัติการแทง</div>'}
-      <div style="margin:1rem 0 .5rem;font-size:.8rem;font-weight:600;color:var(--text2)">ปรับเครดิตด่วน</div>
-      <div class="credit-edit-row">
-        <input type="number" id="quick-credit-amt" placeholder="+500 หรือ -100">
-        <button class="btn-sm primary" onclick="quickCredit('${esc(uid)}')">ปรับ (+/-)</button>
-        <button class="btn-sm" onclick="quickCreditSet('${esc(uid)}')">ตั้งค่า (=)</button>
-      </div>
-    `;
-  }catch(e){$('modal-user-body').innerHTML='<div class="empty">โหลดข้อมูลไม่ได้: '+e.message+'</div>'}
-}
-async function quickCredit(uid){
-  const amt=parseInt($('quick-credit-amt').value);
-  if(isNaN(amt))return;
-  try{
-    const r=await apiFetch('/dashboard/api/users/'+encodeURIComponent(uid)+'/credit',{method:'POST',body:JSON.stringify({amount:amt,reason:'dashboard_quick'})});
-    if(r.ok){toast('ปรับเครดิตสำเร็จ: '+fmt(r.data.old_credit)+' → '+fmt(r.data.new_credit),'success');openUserDetail(uid);loadUsers()}
-    else toast(r.error||'เกิดข้อผิดพลาด','error');
-  }catch(e){toast(e.message,'error')}
-}
-async function quickCreditSet(uid){
-  const amt=parseInt($('quick-credit-amt').value);
-  if(isNaN(amt)||amt<0)return;
-  try{
-    const r=await apiFetch('/dashboard/api/users/'+encodeURIComponent(uid)+'/credit/set',{method:'POST',body:JSON.stringify({amount:amt,reason:'dashboard_set'})});
-    if(r.ok){toast('ตั้งเครดิตสำเร็จ: '+fmt(r.data.new_credit),'success');openUserDetail(uid);loadUsers()}
-    else toast(r.error||'เกิดข้อผิดพลาด','error');
-  }catch(e){toast(e.message,'error')}
-}
-
-// ============ CREDIT MODAL ============
-function openCreditModal(uid,name){
-  $('credit-uid').value=uid;
-  $('credit-modal-title').textContent='ปรับเครดิต: '+(name||uid);
-  $('credit-amount').value='';
-  $('credit-reason').value='';
-  openModal('credit-modal');
-}
-function openAddCreditModal(){$('credit-uid').value='';$('credit-modal-title').textContent='ปรับเครดิต';openModal('credit-modal')}
-async function submitCredit(){
-  const uid=$('credit-uid').value.trim();
-  const amt=parseInt($('credit-amount').value);
-  const reason=($('credit-reason').value||'admin_dashboard').trim();
-  const type=$('credit-type').value;
-  if(!uid){toast('กรุณาใส่ User ID','error');return}
-  if(isNaN(amt)){toast('กรุณาใส่จำนวนเครดิต','error');return}
-  try{
-    const path=type==='set'?`/dashboard/api/users/${encodeURIComponent(uid)}/credit/set`:`/dashboard/api/users/${encodeURIComponent(uid)}/credit`;
-    const r=await apiFetch(path,{method:'POST',body:JSON.stringify({amount:amt,reason})});
-    if(r.ok){toast('บันทึกสำเร็จ','success');closeModal('credit-modal');loadUsers()}
-    else toast(r.error||'เกิดข้อผิดพลาด','error');
-  }catch(e){toast(e.message,'error')}
-}
-
-// ============ DELETE USER ============
-function confirmDeleteUser(uid,name,credit){
-  if(!confirm(`ลบสมาชิก "${name||uid}"?\n${credit>0?'⚠️ สมาชิกยังมีเครดิต '+fmt(credit)+' อยู่ (ต้องกด force)':''}\n\nยืนยัน?`))return;
-  deleteUser(uid,credit>0);
-}
-async function deleteUser(uid,force=false){
-  try{
-    const r=await apiFetch('/dashboard/api/users/'+encodeURIComponent(uid),{method:'DELETE',body:JSON.stringify({force})});
-    if(r.ok){toast('ลบสมาชิกสำเร็จ','success');loadUsers()}
-    else toast(r.error||'ลบไม่ได้','error');
-  }catch(e){toast(e.message,'error')}
-}
-
-// ============ ROUNDS ============
-async function loadRounds(){
-  const el=$('rounds-grid');
-  el.innerHTML='<div class="loading"><div class="spinner"></div> กำลังโหลด...</div>';
-  try{
-    const d=await apiFetch('/dashboard/api/rounds');
-    roundsData=d.data||[];
-    renderRoundsGrid();
-  }catch(e){el.innerHTML='<div class="empty">โหลดข้อมูลไม่ได้</div>'}
-}
-function filterRounds(f){
-  roundsFilter=f;
-  ['all','open','settled'].forEach(x=>{
-    const b=$('filter-'+x);
-    if(b)b.style.background=x===f?'var(--bg4)':'';
-    if(b)b.style.borderColor=x===f?'var(--border2)':'';
-  });
-  renderRoundsGrid();
-}
-function renderRoundsGrid(){
-  let data=roundsData;
-  if(roundsFilter==='open')data=data.filter(r=>r.opened&&!r.settled);
-  if(roundsFilter==='settled')data=data.filter(r=>r.settled);
-  const el=$('rounds-grid');
-  if(!data.length){el.innerHTML='<div class="empty">ไม่พบรอบ</div>';return}
-  el.innerHTML=data.map(r=>roundCardHtml(r)).join('');
-}
-function roundCardHtml(r){
-  const isOpen=r.opened&&!r.settled;
-  return `<div class="round-card ${isOpen?'open':'settled'}" onclick="openRoundDetail('${r.round_id||r.base_no}','${esc(r.camp_name||r.base_no)}')">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.4rem">
-      <div class="round-card-name">${esc(r.camp_name||r.base_no)}</div>
-      ${isOpen?'<span class="badge-pill badge-green">● เปิดอยู่</span>':'<span class="badge-pill badge-gray">○ ปิดแล้ว</span>'}
+async function openUserDet(uid){
+  $('m-user-title').textContent='กำลังโหลด...';$('m-user-body').innerHTML='<div class="loading"><div class="spin"></div></div>';openMod('m-user');
+  try{const d=await api('/dashboard/api/users/'+encodeURIComponent(uid));const u=d.data;$('m-user-title').textContent=u.name||u.user_id;const ms=u.matches||[];
+    $('m-user-body').innerHTML=`<div style="display:grid;grid-template-columns:1fr 1fr;gap:.7rem;margin-bottom:.8rem">
+      <div><div style="font-size:.65rem;color:var(--text2);margin-bottom:.18rem">User ID</div><div class="mono" style="font-size:.68rem;word-break:break-all;color:var(--blue)">${esc(u.user_id)}</div></div>
+      <div><div style="font-size:.65rem;color:var(--text2);margin-bottom:.18rem">ชื่อ</div><div style="font-weight:600">${esc(u.name||'-')}</div></div>
+      <div><div style="font-size:.65rem;color:var(--text2);margin-bottom:.18rem">เลขสมาชิก</div><div class="mono">#${u.member_no||'-'}</div></div>
+      <div><div style="font-size:.65rem;color:var(--text2);margin-bottom:.18rem">เครดิต</div><div style="font-family:'JetBrains Mono',monospace;font-size:1.25rem;font-weight:700;color:var(--neon)">${fmt(u.credit||0)}</div></div>
+      <div><div style="font-size:.65rem;color:var(--text2);margin-bottom:.18rem">ใช้งานล่าสุด</div><div style="font-size:.76rem">${fmtD(u.last_seen_at)}</div></div>
+      <div><div style="font-size:.65rem;color:var(--text2);margin-bottom:.18rem">สมัครเมื่อ</div><div style="font-size:.76rem">${fmtD(u.created_at)}</div></div>
     </div>
-    <div class="round-card-row"><span>ฐาน</span><span class="mono">${r.base_no}</span></div>
-    <div class="round-card-row"><span>คู่แทง</span><span>${fmt(r.match_count||0)} คู่</span></div>
-    <div class="round-card-row"><span>ยอดรวม</span><span class="credit-num mid">${fmt(r.total_amount||0)}</span></div>
-    ${r.winner?`<div class="round-card-row"><span>ผล</span><span class="credit-num high">${esc(r.winner)}</span></div>`:''}
-    <div class="round-card-row"><span>เปิดเมื่อ</span><span style="font-size:.78rem">${fmtDate(r.opened_at)}</span></div>
+    <div style="font-size:.7rem;font-weight:700;color:var(--text2);margin-bottom:.45rem;padding-bottom:.35rem;border-bottom:1px solid var(--border)">ประวัติการแทง (20 ล่าสุด)</div>
+    ${ms.length?`<table class="mtbl"><tr><th>รอบ</th><th>ค่าย</th><th>ฝั่ง</th><th>จำนวน</th><th>สถานะ</th></tr>${ms.map(m=>`<tr><td class="mono">${(m.round_id||'-').substring(0,8)}...</td><td>${esc(m.camp_name||'-')}</td><td>${m.side==='maker'?'<span class="badge bb_">maker</span>':'<span class="badge bp_">taker</span>'}</td><td style="font-family:'JetBrains Mono',monospace;color:var(--yellow)">${fmt(m.amount)}</td><td>${sbadge(m.status)}</td></tr>`).join('')}</table>`:'<div class="empty" style="padding:.85rem">ไม่มีประวัติ</div>'}
+    <div style="font-size:.7rem;font-weight:700;color:var(--text2);margin-top:.8rem;margin-bottom:.4rem">ปรับเครดิตด่วน</div>
+    <div class="cred-row"><input type="number" id="qc-amt" placeholder="+500 / -100"><button class="btn bng" onclick="qCredit('${esc(uid)}',false)">ปรับ (+/-)</button><button class="btn bgh" onclick="qCredit('${esc(uid)}',true)">ตั้งค่า (=)</button></div>`;
+  }catch(e){$('m-user-body').innerHTML='<div class="empty">โหลดไม่ได้: '+e.message+'</div>'}
+}
+async function qCredit(uid,set){const amt=parseInt($('qc-amt').value);if(isNaN(amt))return;const path=set?`/dashboard/api/users/${encodeURIComponent(uid)}/credit/set`:`/dashboard/api/users/${encodeURIComponent(uid)}/credit`;try{const r=await api(path,{method:'POST',body:JSON.stringify({amount:amt,reason:'dashboard_quick'})});if(r.ok){toast('เครดิต: '+fmt(r.data.old_credit)+' → '+fmt(r.data.new_credit),'success');openUserDet(uid);loadUsers()}else toast(r.error||'ผิดพลาด','error')}catch(e){toast(e.message,'error')}}
+function openCreditModal(uid='',name=''){$('c-uid').value=uid;$('m-credit-title').textContent='ปรับเครดิต'+(name?' : '+name:'');$('c-amt').value='';$('c-reason').value='';openMod('m-credit')}
+async function submitCredit(){const uid=$('c-uid').value.trim(),amt=parseInt($('c-amt').value),reason=($('c-reason').value||'admin_dashboard').trim(),type=$('c-type').value;if(!uid){toast('ใส่ User ID ด้วย','error');return}if(isNaN(amt)){toast('ใส่จำนวนเครดิต','error');return}try{const path=type==='set'?`/dashboard/api/users/${encodeURIComponent(uid)}/credit/set`:`/dashboard/api/users/${encodeURIComponent(uid)}/credit`;const r=await api(path,{method:'POST',body:JSON.stringify({amount:amt,reason})});if(r.ok){toast('บันทึกสำเร็จ','success');closeMod('m-credit');loadUsers()}else toast(r.error||'ผิดพลาด','error')}catch(e){toast(e.message,'error')}}
+function delUser(uid,name,credit){if(!confirm(`ลบสมาชิก "${name||uid}"?\n${credit>0?'⚠️ ยังมีเครดิต '+fmt(credit)+' อยู่!':''}`))return;api('/dashboard/api/users/'+encodeURIComponent(uid),{method:'DELETE',body:JSON.stringify({force:credit>0})}).then(r=>{if(r.ok){toast('ลบสำเร็จ','success');loadUsers()}else toast(r.error||'ลบไม่ได้','error')}).catch(e=>toast(e.message,'error'))}
+
+// ========== ROUNDS ==========
+async function loadRounds(){
+  $('r-tbody').innerHTML='<tr><td colspan="7"><div class="loading"><div class="spin"></div></div></td></tr>';
+  try{const d=await api('/dashboard/api/rounds');allRounds=d.data||[];renderOvRounds((allRounds).filter(x=>x.opened&&!x.settled).slice(0,4));renderRoundsTable();}
+  catch{$('r-tbody').innerHTML='<tr><td colspan="7"><div class="empty">โหลดไม่ได้</div></td></tr>'}
+}
+function setRF(f){rf=f;['all','open','settled'].forEach(x=>{const b=$('rf-'+x);if(b)b.className='btn '+(x===f?'bng':'bgh')});renderRoundsTable()}
+function renderRoundsTable(){
+  let data=allRounds;
+  if(rf==='open')data=data.filter(r=>r.opened&&!r.settled);
+  if(rf==='settled')data=data.filter(r=>r.settled);
+  if(!data.length){$('r-tbody').innerHTML='<tr><td colspan="7"><div class="empty">ไม่พบรอบ</div></td></tr>';return}
+  $('r-tbody').innerHTML=data.map(r=>{const io=r.opened&&!r.settled;return`<tr><td><div style="font-weight:600">${esc(r.camp_name||r.base_no)}</div><div class="mono" style="color:var(--text3)">${r.base_no}</div></td><td>${io?'<span class="badge bg_">● เปิดอยู่</span>':'<span class="badge bgr">○ ปิดแล้ว</span>'}</td><td class="mono">${fmt(r.match_count||0)}</td><td style="font-family:'JetBrains Mono',monospace;color:var(--yellow)">${fmt(r.total_amount||0)}</td><td>${r.winner?`<span class="badge bg_">${esc(r.winner)}</span>`:'<span style="color:var(--text3)">-</span>'}</td><td style="font-size:.7rem;color:var(--text3)">${fmtD(r.opened_at)}</td><td><button class="abtn" onclick="openRoundDet('${esc(r.round_id||r.base_no)}','${esc(r.camp_name||r.base_no)}')">ดูคู่</button></td></tr>`}).join('');
+}
+async function openRoundDet(rid,name){$('m-round-title').textContent='รอบ: '+name;$('m-round-body').innerHTML='<div class="loading"><div class="spin"></div></div>';openMod('m-round');try{const d=await api('/dashboard/api/rounds/'+encodeURIComponent(rid)+'/matches');const ms=d.data||[];$('m-round-body').innerHTML=ms.length?`<div style="font-size:.7rem;color:var(--text2);margin-bottom:.55rem">${fmt(ms.length)} คู่</div><table class="mtbl"><tr><th>Maker</th><th>Taker</th><th>จำนวน</th><th>สถานะ</th><th>เวลา</th></tr>${ms.map(m=>`<tr><td>${esc(m.maker_name||'-')}</td><td>${esc(m.taker_name||'-')}</td><td style="font-family:'JetBrains Mono',monospace;color:var(--yellow)">${fmt(m.amount)}</td><td>${sbadge(m.status)}</td><td style="font-size:.65rem;color:var(--text3)">${fmtD(m.created_at)}</td></tr>`).join('')}</table>`:'<div class="empty">ไม่มีคู่แทง</div>'}catch{$('m-round-body').innerHTML='<div class="empty">โหลดไม่ได้</div>'}}
+
+// ========== PROFIT ==========
+async function loadProfit(){try{const d=await api('/dashboard/api/profit');const p=d.data;$('p-total').textContent=fmt(p.total_profit||0);$('p-updated').textContent='อัปเดต: '+fmtD(p.updated_at);$('p-cnt').textContent=fmt((p.rounds||[]).length);const rows=(p.rounds||[]).slice(0,50).reverse();$('p-tbody').innerHTML=rows.map(r=>`<tr><td class="mono" style="color:var(--text3)">${(r.round_id||'-').substring(0,14)}...</td><td>${esc(r.camp_name||r.base_no||'-')}</td><td style="font-family:'JetBrains Mono',monospace;font-weight:700;color:${(r.profit||0)>=0?'var(--neon)':'var(--red)'}">${(r.profit||0)>=0?'+':''}${fmt(r.profit||0)}</td><td style="font-size:.7rem;color:var(--text3)">${fmtD(r.settled_at)}</td></tr>`).join('')||'<tr><td colspan="4"><div class="empty">ไม่มีข้อมูล</div></td></tr>';drawPChart(rows);}catch{toast('โหลดกำไรไม่ได้','error')}}
+function drawPChart(rows){const ctx=$('p-chart')?.getContext('2d');if(!ctx)return;if(pChart)pChart.destroy();const data=rows.map(r=>r.profit||0);pChart=new Chart(ctx,{type:'bar',data:{labels:rows.map((_,i)=>i+1),datasets:[{data,backgroundColor:data.map(v=>v>=0?'#00ff8840':'#ff444440'),borderColor:data.map(v=>v>=0?'#00ff88':'#ff4444'),borderWidth:1,borderRadius:2}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#3d5166',font:{size:8},maxTicksLimit:10},grid:{color:'#1e2d3d44'}},y:{ticks:{color:'#6b8299',font:{size:8},callback:v=>fmt(v)},grid:{color:'#1e2d3d'}}}}})}
+
+// ========== SYSTEM ==========
+async function loadSysInfo(){
+  $('sys-status').textContent='กำลังโหลด...';
+  try{
+    const [si,pr]=await Promise.all([api('/dashboard/api/system/info'),api('/dashboard/api/profit')]);
+    if(si.ok){const d=si.data;
+      $('sys-info-grid').innerHTML=`
+        <div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:.65rem .75rem"><div style="font-size:.65rem;color:var(--text2)">Disk ที่ใช้</div><div style="font-family:'JetBrains Mono',monospace;font-size:1rem;font-weight:700;color:var(--blue)">${d.disk_used_mb} MB</div><div style="font-size:.62rem;color:var(--text3)">จาก ${d.disk_total_mb} MB</div></div>
+        <div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:.65rem .75rem"><div style="font-size:.65rem;color:var(--text2)">Backup Files</div><div style="font-family:'JetBrains Mono',monospace;font-size:1rem;font-weight:700;color:var(--orange)">${d.backup_file_count}</div><div style="font-size:.62rem;color:var(--text3)">${d.backup_size_kb} KB</div></div>
+        <div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:.65rem .75rem"><div style="font-size:.65rem;color:var(--text2)">Matches ทั้งหมด</div><div style="font-family:'JetBrains Mono',monospace;font-size:1rem;font-weight:700;color:var(--text)">${fmt(d.total_matches)}</div><div style="font-size:.62rem;color:var(--text3)">pending: ${fmt(d.pending_matches)}</div></div>
+        <div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:.65rem .75rem"><div style="font-size:.65rem;color:var(--text2)">Commission</div><div style="font-family:'JetBrains Mono',monospace;font-size:1rem;font-weight:700;color:var(--purple)">${d.commission_percent}%</div><div style="font-size:.62rem;color:var(--text3)">ต่อรอบชนะ</div></div>`;
+      $('si-pending').textContent=fmt(d.pending_matches);$('si-total-match').textContent=fmt(d.total_matches);
+      $('si-backup-cnt').textContent=d.backup_file_count;$('si-backup-size').textContent=d.backup_size_kb;
+      $('sys-status').textContent='ออนไลน์';$('sys-status').className='tag tg';
+    }
+    if(pr.ok){$('si-profit').textContent=fmt(pr.data.total_profit||0)+' เครดิต';$('si-profit-rounds').textContent=fmt((pr.data.rounds||[]).length)+' รอบ';}
+  }catch(e){$('sys-status').textContent='โหลดไม่ได้';$('sys-status').className='tag tr'}
+}
+
+let pendingAction=null;
+function confirmSysAction(action,title,msg){
+  pendingAction=action;
+  $('m-confirm-title').textContent='⚠️ ยืนยัน: '+title;
+  $('m-confirm-msg').textContent=msg;
+  $('m-confirm-btn').onclick=()=>{closeMod('m-confirm');execSysAction(action)};
+  openMod('m-confirm');
+}
+async function execSysAction(action){
+  let path='',body={};
+  if(action==='reset-profit'){path='/dashboard/api/system/reset-profit';body={reset_by:'dashboard_admin'}}
+  else if(action==='reset-orders'){path='/dashboard/api/system/reset-orders';body={reset_by:'dashboard_admin',next_order_no:parseInt($('reset-order-no').value)||1}}
+  else if(action==='clear-round-backups'){path='/dashboard/api/system/clear-round-backups';body={clear_by:'dashboard_admin'}}
+  try{
+    toast('กำลังดำเนินการ...','info');
+    const r=await api(path,{method:'POST',body:JSON.stringify(body)});
+    if(r.ok){
+      toast('สำเร็จ!','success');
+      $('sys-result-box').textContent=r.message||'สำเร็จ';
+      $('sys-result-panel').style.display='block';
+      setTimeout(loadSysInfo,500);
+      if(action==='reset-profit')setTimeout(()=>{$('s-profit').textContent='0';$('ov-profit').textContent='0'},300);
+    }else{toast(r.error||'ผิดพลาด','error');$('sys-result-box').textContent='Error: '+(r.error||'unknown');$('sys-result-panel').style.display='block'}
+  }catch(e){
+    // ถ้า route ยังไม่มีใน app.py ให้แจ้ง
+    if(e.message.includes('404')||e.message.includes('Unexpected'))toast('⚠️ กรุณาเพิ่มโค้ด routes ใน app.py ก่อน (ดูไฟล์ เพิ่มท้าย_app.py.txt)','warning');
+    else toast(e.message,'error');
+  }
+}
+
+// ========== ADMINS ==========
+async function loadAdmins(){
+  $('env-admins-list').innerHTML='<div class="loading"><div class="spin"></div></div>';
+  $('dyn-admins-list').innerHTML='<div class="loading"><div class="spin"></div></div>';
+  try{
+    const d=await api('/dashboard/api/admins');
+    const env=d.data.env||[];const dyn=d.data.dynamic||[];
+    $('env-admins-list').innerHTML=env.length?env.map(a=>adminRow(a,'env')).join(''):'<div class="empty">ไม่มีแอดมินจาก .env</div>';
+    $('dyn-admins-list').innerHTML=dyn.length?dyn.map(a=>adminRow(a,'dyn')).join(''):'<div class="empty">ยังไม่มีแอดมิน dynamic<br><small>เพิ่มจากรายชื่อด้านล่าง</small></div>';
+  }catch(e){
+    const msg='<div class="empty">โหลดไม่ได้ — กรุณาเพิ่ม routes ใน app.py</div>';
+    $('env-admins-list').innerHTML=msg;$('dyn-admins-list').innerHTML=msg;
+  }
+}
+function adminRow(a,type){
+  const isDyn=type==='dyn';
+  return `<div class="admin-row">
+    <div style="flex:1;min-width:0">
+      <div class="mname">${esc(a.name||a.user_id)}</div>
+      <div class="mid_">${(a.user_id||'').substring(0,16)}...</div>
+      <div style="font-size:.62rem;color:var(--text3);margin-top:.1rem">เพิ่มเมื่อ: ${a.added_by==='env'?'.env':fmtD(a.added_at)}</div>
+    </div>
+    <span class="admin-source ${isDyn?'admin-dyn':'admin-env'}">${isDyn?'dynamic':'env'}</span>
+    ${isDyn?`<button class="abtn d" onclick="removeAdmin('${esc(a.user_id)}','${esc(a.name||a.user_id)}')">ลบ</button>`:''}
   </div>`;
 }
-async function openRoundDetail(roundId,campName){
-  $('round-modal-title').textContent='รอบ: '+(campName||roundId);
-  $('round-modal-body').innerHTML='<div class="loading"><div class="spinner"></div> กำลังโหลด...</div>';
-  openModal('round-modal');
+let admAllUsers=[];
+async function loadAdmUsers(){
+  const q=($('adm-search').value||'').trim();
+  $('adm-u-tbody').innerHTML='<tr><td colspan="4"><div class="loading"><div class="spin"></div></div></td></tr>';
   try{
-    const d=await apiFetch('/dashboard/api/rounds/'+encodeURIComponent(roundId)+'/matches');
-    const matches=d.data||[];
-    $('round-modal-body').innerHTML=matches.length?`
-      <div style="font-size:.8rem;color:var(--text2);margin-bottom:.75rem">${fmt(matches.length)} คู่</div>
-      <table class="matches-mini-table">
-        <tr><th>Maker</th><th>Taker</th><th>จำนวน</th><th>สถานะ</th><th>เวลา</th></tr>
-        ${matches.map(m=>`<tr>
-          <td>${esc(m.maker_name||'-')}</td>
-          <td>${esc(m.taker_name||'-')}</td>
-          <td><span class="credit-num mid">${fmt(m.amount)}</span></td>
-          <td>${statusBadge(m.status)}</td>
-          <td style="font-size:.72rem;color:var(--text3)">${fmtDate(m.created_at)}</td>
-        </tr>`).join('')}
-      </table>
-    `:'<div class="empty">ไม่มีคู่แทงในรอบนี้</div>';
-  }catch(e){$('round-modal-body').innerHTML='<div class="empty">โหลดข้อมูลไม่ได้</div>'}
+    const d=await api(`/dashboard/api/users?q=${encodeURIComponent(q)}&sort=credit&order=desc&per_page=50`);
+    admAllUsers=d.data||[];renderAdmUsers();
+  }catch{$('adm-u-tbody').innerHTML='<tr><td colspan="4"><div class="empty">โหลดไม่ได้</div></td></tr>'}
+}
+function renderAdmUsers(){
+  if(!admAllUsers.length){$('adm-u-tbody').innerHTML='<tr><td colspan="4"><div class="empty">ไม่พบสมาชิก</div></td></tr>';return}
+  $('adm-u-tbody').innerHTML=admAllUsers.map(u=>`<tr>
+    <td><div style="font-weight:600;font-size:.78rem">${esc(u.name||u.user_id)}</div><div class="mono" style="color:var(--text3)">${(u.user_id||'').substring(0,14)}...</div></td>
+    <td style="font-family:'JetBrains Mono',monospace;color:var(--neon)">${fmt(u.credit||0)}</td>
+    <td>${(u.credit||0)>0?'<span class="badge bg_">● มีเครดิต</span>':'<span class="badge bgr">○ ไม่มี</span>'}</td>
+    <td><button class="abtn" onclick="addAdmin('${esc(u.user_id)}','${esc(u.name||u.user_id)}')">+ แอดมิน</button></td>
+  </tr>`).join('');
+}
+function debAdmSearch(){clearTimeout(admSearchT);admSearchT=setTimeout(loadAdmUsers,380)}
+function openAddAdminModal(){$('adm-uid').value='';openMod('m-add-admin')}
+async function submitAddAdmin(){const uid=$('adm-uid').value.trim();if(!uid){toast('ใส่ User ID ด้วย','error');return}await addAdmin(uid);closeMod('m-add-admin')}
+async function addAdmin(uid,name=''){
+  try{const r=await api('/dashboard/api/admins/'+encodeURIComponent(uid),{method:'POST'});if(r.ok){toast('เพิ่มแอดมิน '+esc(name||uid)+' สำเร็จ','success');loadAdmins()}else toast(r.error||'ผิดพลาด','error')}
+  catch(e){
+    if(e.message.includes('404'))toast('⚠️ กรุณาเพิ่ม routes ใน app.py ก่อน','warning');
+    else toast(e.message,'error');}
+}
+async function removeAdmin(uid,name){
+  if(!confirm(`ลบแอดมิน "${name}" ออก?`))return;
+  try{const r=await api('/dashboard/api/admins/'+encodeURIComponent(uid),{method:'DELETE'});if(r.ok){toast('ลบแอดมินสำเร็จ','success');loadAdmins()}else toast(r.error||'ผิดพลาด','error')}
+  catch(e){toast(e.message,'error')}
 }
 
-// ============ PROFIT ============
-async function loadProfit(){
-  try{
-    const d=await apiFetch('/dashboard/api/profit');
-    const p=d.data;
-    $('p-total').textContent=fmt(p.total_profit||0);
-    $('p-updated').textContent='อัปเดต: '+fmtDate(p.updated_at);
-    const rounds=(p.rounds||[]).slice(0,50).reverse();
-    renderProfitTable(rounds);
-    drawProfitChart('profit-chart',rounds);
-    drawProfitChart('profit-chart2',rounds);
-  }catch(e){toast('โหลดกำไรไม่ได้: '+e.message,'error')}
-}
-function renderProfitTable(rounds){
-  $('profit-tbody').innerHTML=rounds.map(r=>`<tr>
-    <td class="mono" style="font-size:.75rem">${(r.round_id||'-').substring(0,12)}...</td>
-    <td><span class="credit-num ${(r.profit||0)>0?'high':'low'}">${(r.profit||0)>0?'+':''}${fmt(r.profit||0)}</span></td>
-    <td style="font-size:.78rem;color:var(--text3)">${fmtDate(r.settled_at)}</td>
-    <td>${esc(r.camp_name||r.base_no||'-')}</td>
-  </tr>`).join('')||'<tr><td colspan="4"><div class="empty">ไม่มีข้อมูล</div></td></tr>';
-}
-function drawProfitChart(canvasId,rounds){
-  const ctx=$(canvasId)?.getContext('2d');
-  if(!ctx)return;
-  const labels=rounds.map((_,i)=>'รอบ '+(i+1));
-  const data=rounds.map(r=>r.profit||0);
-  if(canvasId==='profit-chart'&&profitChart){profitChart.destroy()}
-  if(canvasId==='profit-chart2'&&profitChart2){profitChart2.destroy()}
-  const ch=new Chart(ctx,{
-    type:'bar',
-    data:{
-      labels,
-      datasets:[{
-        label:'กำไร',
-        data,
-        backgroundColor:data.map(v=>v>=0?'#3fb95066':'#f8514966'),
-        borderColor:data.map(v=>v>=0?'#3fb950':'#f85149'),
-        borderWidth:1,
-        borderRadius:3
-      }]
-    },
-    options:{
-      responsive:true,maintainAspectRatio:false,
-      plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>'กำไร: '+fmt(c.raw)}}},
-      scales:{
-        x:{ticks:{color:'#8b949e',font:{size:9},maxTicksLimit:12},grid:{color:'#30363d44'}},
-        y:{ticks:{color:'#8b949e',font:{size:10},callback:v=>fmt(v)},grid:{color:'#30363d44'}}
-      }
-    }
-  });
-  if(canvasId==='profit-chart')profitChart=ch;
-  else profitChart2=ch;
-}
+// ========== HELPERS ==========
+function sbadge(s){const m={matched:'bb_',settled:'bg_',pending:'bo_',cancelled:'bgr'};const l={matched:'จับคู่แล้ว',settled:'ปิดแล้ว',pending:'รอ',cancelled:'ยกเลิก'};return`<span class="badge ${m[s]||'bgr'}">${l[s]||s||'-'}</span>`}
+function openMod(id){$(id).classList.add('open')}
+function closeMod(id){$(id).classList.remove('open')}
+document.addEventListener('click',e=>{if(e.target.classList.contains('modal-bg'))e.target.classList.remove('open')})
+function toast(msg,type='info'){const el=document.createElement('div');el.className='toast '+type;el.textContent=msg;$('toasts').appendChild(el);setTimeout(()=>el.remove(),5000)}
 
-// ============ TOP 5 ============
-function renderTop5(top5){
-  $('top5-list').innerHTML=top5.map((u,i)=>`<li>
-    <span class="top-rank">${['🥇','🥈','🥉','4','5'][i]||i+1}</span>
-    <div class="top-name">${esc(u.name||u.user_id)}</div>
-    <span class="top-credit">${fmt(u.credit)}</span>
-  </li>`).join('');
-}
-
-// ============ STATUS BADGE ============
-function statusBadge(s){
-  const m={matched:'badge-blue',settled:'badge-green',pending:'badge-yellow',cancelled:'badge-gray'};
-  const l={matched:'จับคู่แล้ว',settled:'ปิดแล้ว',pending:'รอ',cancelled:'ยกเลิก'};
-  return `<span class="badge-pill ${m[s]||'badge-gray'}">${l[s]||s||'-'}</span>`;
-}
-
-// ============ MODAL ============
-function openModal(id){$(id).classList.add('open')}
-function closeModal(id){$(id).classList.remove('open')}
-document.addEventListener('click',e=>{
-  if(e.target.classList.contains('modal-bg'))e.target.classList.remove('open');
-});
-
-// ============ TOAST ============
-function toast(msg,type='info'){
-  const el=document.createElement('div');
-  el.className='toast '+type;
-  el.textContent=msg;
-  $('toasts').appendChild(el);
-  setTimeout(()=>el.remove(),4000);
-}
-
-// ============ UTILS ============
-function esc(s){return String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
-
-// ============ INIT ============
-(function init(){
-  const url=sessionStorage.getItem('bot_url');
-  const tok=sessionStorage.getItem('bot_tok');
-  if(url&&tok){BASE_URL=url;TOKEN=tok;showApp();}
-  $('login-token').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin()});
-  $('login-url').addEventListener('keydown',e=>{if(e.key==='Enter')$('login-token').focus()});
+// ========== INIT ==========
+(function(){
+  renderSavedList();
+  const u=sessionStorage.getItem('bu'),t=sessionStorage.getItem('bt');
+  if(u&&t){BASE=u;TOK=t;showApp()}
+  $('li-tok').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin()});
+  $('li-url').addEventListener('keydown',e=>{if(e.key==='Enter')$('li-tok').focus()});
 })();
 </script>
 </body>
