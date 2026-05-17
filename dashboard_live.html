@@ -1,0 +1,951 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bot Admin Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0a0c10;
+  --surface: #11141c;
+  --surface2: #181d28;
+  --surface3: #1f2535;
+  --border: #252b3b;
+  --text: #dde4f2;
+  --muted: #5b647f;
+  --accent: #3d7fff;
+  --green: #22c55e;
+  --red: #f43f5e;
+  --yellow: #f59e0b;
+  --cyan: #06b6d4;
+  --purple: #a78bfa;
+  --orange: #fb923c;
+  --radius: 10px;
+  --radius-sm: 7px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'IBM Plex Sans Thai', sans-serif; background: var(--bg); color: var(--text); font-size: 13px; min-height: 100vh; }
+
+/* CONFIG OVERLAY */
+#configOverlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.92);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 9999;
+}
+.config-box {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 14px; padding: 32px; width: 420px; max-width: 95vw;
+}
+.config-box h2 { font-size: 18px; font-weight: 700; margin-bottom: 6px; }
+.config-box p { font-size: 12px; color: var(--muted); margin-bottom: 20px; }
+.config-field { margin-bottom: 14px; }
+.config-field label { font-size: 11px; color: var(--muted); display: block; margin-bottom: 5px; font-weight: 600; }
+.config-field input {
+  width: 100%; padding: 9px 12px;
+  background: var(--surface2); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); color: var(--text);
+  font-family: 'JetBrains Mono', monospace; font-size: 12px;
+  outline: none; transition: border-color 0.2s;
+}
+.config-field input:focus { border-color: var(--accent); }
+.btn-primary {
+  width: 100%; padding: 10px; border-radius: var(--radius-sm);
+  background: var(--accent); border: none; color: #fff;
+  font-size: 13px; font-weight: 700; cursor: pointer;
+  font-family: 'IBM Plex Sans Thai', sans-serif;
+  transition: opacity 0.15s;
+}
+.btn-primary:hover { opacity: 0.9; }
+.config-hint { font-size: 11px; color: var(--muted); margin-top: 14px; line-height: 1.6; }
+
+/* LAYOUT */
+.app { display: flex; flex-direction: column; min-height: 100vh; }
+
+/* TOPBAR */
+.topbar {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 18px; height: 50px;
+  background: var(--surface); border-bottom: 1px solid var(--border);
+  position: sticky; top: 0; z-index: 100;
+}
+.topbar-left { display: flex; align-items: center; gap: 10px; }
+.logo { background: linear-gradient(135deg, #22c55e, #16a34a); color: #052e16; padding: 3px 9px; border-radius: 5px; font-size: 10px; font-weight: 800; letter-spacing: 0.5px; display: flex; align-items: center; gap: 5px; }
+.logo-dot { width: 6px; height: 6px; background: #052e16; border-radius: 50%; }
+.topbar-title { font-size: 14px; font-weight: 700; }
+.topbar-sub { font-size: 11px; color: var(--muted); }
+.topbar-right { display: flex; align-items: center; gap: 8px; }
+
+.conn-badge { display: flex; align-items: center; gap: 5px; padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+.conn-badge.connected { background: rgba(34,197,94,0.1); border: 1px solid rgba(34,197,94,0.25); color: var(--green); }
+.conn-badge.disconnected { background: rgba(244,63,94,0.1); border: 1px solid rgba(244,63,94,0.25); color: var(--red); }
+.conn-badge.connecting { background: rgba(245,158,11,0.1); border: 1px solid rgba(245,158,11,0.25); color: var(--yellow); }
+.conn-dot { width: 6px; height: 6px; border-radius: 50%; }
+.conn-badge.connected .conn-dot { background: var(--green); animation: pulse 2s infinite; }
+.conn-badge.disconnected .conn-dot { background: var(--red); }
+.conn-badge.connecting .conn-dot { background: var(--yellow); animation: pulse 1s infinite; }
+@keyframes pulse { 0%,100%{opacity:1}50%{opacity:0.4} }
+
+.btn-sm { padding: 5px 10px; border-radius: 6px; border: 1px solid var(--border); background: var(--surface2); color: var(--muted); font-size: 11px; cursor: pointer; font-family: 'IBM Plex Sans Thai', sans-serif; transition: all 0.15s; }
+.btn-sm:hover { color: var(--text); background: var(--surface3); }
+
+/* NAV TABS */
+.nav-tabs { display: flex; gap: 2px; padding: 10px 18px 0; border-bottom: 1px solid var(--border); background: var(--surface); }
+.nav-tab { padding: 8px 14px; font-size: 12px; font-weight: 600; color: var(--muted); cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.15s; border-radius: 5px 5px 0 0; }
+.nav-tab:hover { color: var(--text); }
+.nav-tab.active { color: var(--accent); border-bottom-color: var(--accent); background: rgba(61,127,255,0.06); }
+
+/* CONTENT */
+.content { flex: 1; padding: 16px 18px; }
+
+/* PAGE */
+.page { display: none; }
+.page.active { display: block; }
+
+/* STAT GRID */
+.stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 14px; }
+@media(max-width:900px){ .stat-grid { grid-template-columns: repeat(2,1fr); } }
+
+.stat-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 14px 16px;
+  display: flex; flex-direction: column; gap: 5px;
+  position: relative; overflow: hidden;
+  transition: border-color 0.2s;
+}
+.stat-card:hover { border-color: rgba(61,127,255,0.2); }
+.stat-label { font-size: 11px; color: var(--muted); font-weight: 500; }
+.stat-value { font-size: 26px; font-weight: 700; font-family: 'JetBrains Mono', monospace; }
+.stat-sub { font-size: 10.5px; color: var(--muted); }
+.c-blue { color: var(--accent); }
+.c-green { color: var(--green); }
+.c-yellow { color: var(--yellow); }
+.c-purple { color: var(--purple); }
+.c-red { color: var(--red); }
+.c-cyan { color: var(--cyan); }
+
+/* CARD */
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; margin-bottom: 12px; }
+.card-head { display: flex; align-items: center; justify-content: space-between; padding: 12px 14px; border-bottom: 1px solid var(--border); }
+.card-head-title { font-size: 12px; font-weight: 700; display: flex; align-items: center; gap: 6px; }
+.card-body { padding: 14px; }
+
+/* TABLE */
+.tbl-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 12px; }
+th { font-size: 10.5px; font-weight: 700; color: var(--muted); padding: 8px 10px; text-align: left; border-bottom: 1px solid var(--border); white-space: nowrap; background: var(--surface2); }
+td { padding: 9px 10px; border-bottom: 1px solid var(--border); vertical-align: middle; white-space: nowrap; }
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: rgba(255,255,255,0.02); }
+.mono { font-family: 'JetBrains Mono', monospace; }
+
+/* BADGE */
+.badge { display: inline-flex; align-items: center; padding: 2px 7px; border-radius: 4px; font-size: 10px; font-weight: 700; white-space: nowrap; }
+.badge-green { background: rgba(34,197,94,0.12); color: var(--green); border: 1px solid rgba(34,197,94,0.2); }
+.badge-red { background: rgba(244,63,94,0.12); color: var(--red); border: 1px solid rgba(244,63,94,0.2); }
+.badge-yellow { background: rgba(245,158,11,0.12); color: var(--yellow); border: 1px solid rgba(245,158,11,0.2); }
+.badge-blue { background: rgba(61,127,255,0.12); color: var(--accent); border: 1px solid rgba(61,127,255,0.2); }
+.badge-gray { background: rgba(91,100,127,0.15); color: var(--muted); border: 1px solid var(--border); }
+.badge-purple { background: rgba(167,139,250,0.12); color: var(--purple); border: 1px solid rgba(167,139,250,0.2); }
+
+/* CONTROLS */
+.controls { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+.search-input {
+  padding: 7px 12px; background: var(--surface2); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); color: var(--text); font-size: 12px;
+  font-family: 'IBM Plex Sans Thai', sans-serif; outline: none; width: 220px;
+  transition: border-color 0.2s;
+}
+.search-input:focus { border-color: var(--accent); }
+.select-ctrl {
+  padding: 7px 10px; background: var(--surface2); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); color: var(--text); font-size: 11px;
+  outline: none; cursor: pointer;
+}
+
+/* ACTION BUTTONS */
+.btn-act { padding: 5px 10px; border-radius: 5px; border: 1px solid var(--border); font-size: 11px; cursor: pointer; font-family: 'IBM Plex Sans Thai', sans-serif; transition: all 0.15s; font-weight: 600; }
+.btn-add-credit { background: rgba(34,197,94,0.1); border-color: rgba(34,197,94,0.25); color: var(--green); }
+.btn-add-credit:hover { background: rgba(34,197,94,0.2); }
+.btn-sub-credit { background: rgba(245,158,11,0.1); border-color: rgba(245,158,11,0.25); color: var(--yellow); }
+.btn-sub-credit:hover { background: rgba(245,158,11,0.2); }
+.btn-del { background: rgba(244,63,94,0.1); border-color: rgba(244,63,94,0.25); color: var(--red); }
+.btn-del:hover { background: rgba(244,63,94,0.2); }
+.btn-view { background: rgba(61,127,255,0.1); border-color: rgba(61,127,255,0.25); color: var(--accent); }
+.btn-view:hover { background: rgba(61,127,255,0.2); }
+
+/* MODAL */
+.modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 500; display: none; align-items: center; justify-content: center; }
+.modal-backdrop.show { display: flex; }
+.modal { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 24px; width: 400px; max-width: 95vw; }
+.modal h3 { font-size: 15px; font-weight: 700; margin-bottom: 5px; }
+.modal p { font-size: 12px; color: var(--muted); margin-bottom: 16px; }
+.modal-field { margin-bottom: 12px; }
+.modal-field label { font-size: 11px; color: var(--muted); display: block; margin-bottom: 4px; font-weight: 600; }
+.modal-field input, .modal-field textarea {
+  width: 100%; padding: 8px 10px;
+  background: var(--surface2); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); color: var(--text); font-size: 12px;
+  font-family: 'JetBrains Mono', monospace; outline: none;
+  transition: border-color 0.2s;
+}
+.modal-field input:focus, .modal-field textarea:focus { border-color: var(--accent); }
+.modal-btns { display: flex; gap: 8px; margin-top: 14px; }
+.modal-btns button { flex: 1; padding: 9px; border-radius: var(--radius-sm); font-size: 12px; font-weight: 700; cursor: pointer; font-family: 'IBM Plex Sans Thai', sans-serif; border: none; transition: opacity 0.15s; }
+.modal-btns button:hover { opacity: 0.85; }
+.modal-btn-confirm { background: var(--accent); color: #fff; }
+.modal-btn-cancel { background: var(--surface3); color: var(--muted); }
+.modal-btn-danger { background: var(--red); color: #fff; }
+
+/* PAGINATION */
+.pagination { display: flex; align-items: center; gap: 5px; padding: 10px 14px; border-top: 1px solid var(--border); font-size: 12px; color: var(--muted); }
+.page-btn { padding: 4px 9px; border-radius: 5px; border: 1px solid var(--border); background: var(--surface2); color: var(--muted); cursor: pointer; font-size: 11px; }
+.page-btn:hover { color: var(--text); }
+.page-btn.active { background: rgba(61,127,255,0.15); border-color: rgba(61,127,255,0.3); color: var(--accent); }
+.page-info { margin-left: auto; font-size: 11px; }
+
+/* PROFIT ROUNDS */
+.profit-rounds { display: flex; flex-direction: column; gap: 6px; max-height: 400px; overflow-y: auto; }
+.profit-row { display: flex; align-items: center; gap: 10px; padding: 9px 12px; background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-sm); }
+.profit-camp { flex: 1; font-size: 12px; font-weight: 600; }
+.profit-result { font-size: 11px; color: var(--muted); }
+.profit-amount { font-size: 14px; font-weight: 700; font-family: 'JetBrains Mono', monospace; color: var(--green); }
+
+/* ROUND CARDS */
+.round-cards { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; }
+@media(max-width:800px){ .round-cards { grid-template-columns: 1fr 1fr; } }
+.round-card { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 12px; cursor: pointer; transition: border-color 0.15s; }
+.round-card:hover { border-color: rgba(61,127,255,0.3); }
+.round-card-name { font-size: 13px; font-weight: 700; margin-bottom: 4px; }
+.round-card-meta { font-size: 11px; color: var(--muted); }
+.round-card-stat { margin-top: 8px; display: flex; gap: 6px; }
+
+/* TOAST */
+#toast {
+  position: fixed; bottom: 20px; right: 20px; z-index: 9000;
+  display: flex; flex-direction: column; gap: 6px;
+}
+.toast-item {
+  padding: 10px 14px; border-radius: var(--radius-sm);
+  font-size: 12px; font-weight: 600; animation: slideIn 0.2s ease;
+  border: 1px solid transparent;
+}
+.toast-success { background: rgba(34,197,94,0.15); border-color: rgba(34,197,94,0.3); color: var(--green); }
+.toast-error { background: rgba(244,63,94,0.15); border-color: rgba(244,63,94,0.3); color: var(--red); }
+.toast-info { background: rgba(61,127,255,0.15); border-color: rgba(61,127,255,0.3); color: var(--accent); }
+@keyframes slideIn { from { opacity:0; transform: translateX(20px); } to { opacity:1; transform: translateX(0); } }
+
+/* SCROLLBAR */
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+/* STATUS BAR */
+.statusbar { display: flex; align-items: center; gap: 12px; padding: 6px 18px; background: var(--surface); border-top: 1px solid var(--border); font-size: 10.5px; color: var(--muted); }
+.statusbar-item { display: flex; align-items: center; gap: 4px; }
+
+/* LOADING */
+.loading { display: flex; align-items: center; gap: 8px; color: var(--muted); font-size: 12px; padding: 20px; }
+.spinner { width: 16px; height: 16px; border: 2px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.7s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* EMPTY */
+.empty { text-align: center; padding: 40px; color: var(--muted); font-size: 12px; }
+.empty-icon { font-size: 32px; margin-bottom: 8px; }
+
+/* USER DETAIL SIDE */
+.user-detail-grid { display: grid; grid-template-columns: 280px 1fr; gap: 12px; }
+@media(max-width:800px){ .user-detail-grid { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+
+<!-- CONFIG OVERLAY -->
+<div id="configOverlay">
+  <div class="config-box">
+    <h2>🔐 เชื่อมต่อ Bot API</h2>
+    <p>ใส่ URL ของบอทและ Token เพื่อเข้าใช้ Dashboard</p>
+    <div class="config-field">
+      <label>Bot URL (เช่น https://your-bot.railway.app หรือ http://localhost:5000)</label>
+      <input type="text" id="cfgUrl" placeholder="https://your-bot-url.com" />
+    </div>
+    <div class="config-field">
+      <label>DASHBOARD_SECRET_TOKEN (จาก .env)</label>
+      <input type="password" id="cfgToken" placeholder="ใส่ token ที่ตั้งใน .env" />
+    </div>
+    <button class="btn-primary" onclick="saveConfig()">เชื่อมต่อ</button>
+    <div class="config-hint">
+      ⚙️ วิธีตั้งค่าบอท: เพิ่ม <code style="background:var(--surface3);padding:1px 5px;border-radius:3px;">DASHBOARD_SECRET_TOKEN=yourtoken</code> ใน .env<br>
+      แล้ว copy code จาก <strong>admin_api_routes.py</strong> ใส่ใน app.py ก่อน <code>if __name__ == "__main__":</code>
+    </div>
+  </div>
+</div>
+
+<!-- APP -->
+<div class="app" id="appContainer" style="display:none">
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="topbar-left">
+    <div class="logo"><div class="logo-dot"></div>LINE OA</div>
+    <div>
+      <div class="topbar-title">Bot Admin Dashboard</div>
+      <div class="topbar-sub" id="topbarSub">กำลังเชื่อมต่อ...</div>
+    </div>
+  </div>
+  <div class="topbar-right">
+    <div class="conn-badge connecting" id="connBadge">
+      <div class="conn-dot"></div>
+      <span id="connText">กำลังเชื่อมต่อ</span>
+    </div>
+    <button class="btn-sm" onclick="openConfig()">⚙️ ตั้งค่า</button>
+  </div>
+</div>
+
+<!-- NAV TABS -->
+<div class="nav-tabs">
+  <div class="nav-tab active" onclick="switchTab('dashboard')">📊 Dashboard</div>
+  <div class="nav-tab" onclick="switchTab('users')">👥 สมาชิก</div>
+  <div class="nav-tab" onclick="switchTab('rounds')">🎯 รอบ</div>
+  <div class="nav-tab" onclick="switchTab('profit')">💰 กำไร</div>
+</div>
+
+<!-- CONTENT -->
+<div class="content">
+
+  <!-- PAGE: DASHBOARD -->
+  <div class="page active" id="page-dashboard">
+    <div class="stat-grid">
+      <div class="stat-card">
+        <div class="stat-label">👥 สมาชิกทั้งหมด</div>
+        <div class="stat-value c-blue" id="s-total-users">—</div>
+        <div class="stat-sub">มีเครดิต: <span id="s-active-users">—</span> คน</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">💳 เครดิตในระบบ</div>
+        <div class="stat-value c-cyan" id="s-total-credit">—</div>
+        <div class="stat-sub">รวมทุกสมาชิก</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">💰 กำไรสะสม</div>
+        <div class="stat-value c-green" id="s-total-profit">—</div>
+        <div class="stat-sub">ระบบหัก % อัตโนมัติ</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">🎯 รอบที่เปิดอยู่</div>
+        <div class="stat-value c-yellow" id="s-open-rounds">—</div>
+        <div class="stat-sub">ยอดเดิมพัน: <span id="s-total-bets">—</span></div>
+      </div>
+    </div>
+
+    <!-- TOP MEMBERS -->
+    <div class="card">
+      <div class="card-head">
+        <div class="card-head-title">🏆 TOP สมาชิก (เครดิตสูงสุด)</div>
+        <div class="badge badge-blue" id="last-update-badge">Live</div>
+      </div>
+      <div class="tbl-wrap">
+        <table>
+          <thead>
+            <tr><th>#</th><th>ชื่อ</th><th>User ID</th><th>เครดิต</th><th>สถานะ</th></tr>
+          </thead>
+          <tbody id="top5-body">
+            <tr><td colspan="5"><div class="loading"><div class="spinner"></div>กำลังโหลด...</div></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAGE: USERS -->
+  <div class="page" id="page-users">
+    <div class="controls">
+      <input class="search-input" type="text" id="userSearch" placeholder="🔍 ค้นหาชื่อ / User ID / หมายเลขสมาชิก" oninput="debounceLoadUsers()">
+      <select class="select-ctrl" id="userSort" onchange="loadUsers()">
+        <option value="credit">เรียงตามเครดิต</option>
+        <option value="name">เรียงตามชื่อ</option>
+        <option value="member_no">เรียงตามหมายเลข</option>
+        <option value="last_seen">เรียงตามใช้ล่าสุด</option>
+      </select>
+      <select class="select-ctrl" id="userOrder" onchange="loadUsers()">
+        <option value="desc">มากไปน้อย</option>
+        <option value="asc">น้อยไปมาก</option>
+      </select>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <div class="card-head-title">👥 รายชื่อสมาชิกทั้งหมด</div>
+        <span class="badge badge-gray" id="users-count-badge">—</span>
+      </div>
+      <div class="tbl-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>ชื่อ</th>
+              <th>User ID</th>
+              <th>เครดิต</th>
+              <th>เพื่อน OA</th>
+              <th>ใช้ล่าสุด</th>
+              <th>จัดการ</th>
+            </tr>
+          </thead>
+          <tbody id="users-body">
+            <tr><td colspan="7"><div class="loading"><div class="spinner"></div>กำลังโหลด...</div></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="pagination" id="users-pagination"></div>
+    </div>
+  </div>
+
+  <!-- PAGE: ROUNDS -->
+  <div class="page" id="page-rounds">
+    <div class="round-cards" id="round-cards">
+      <div class="loading"><div class="spinner"></div>กำลังโหลด...</div>
+    </div>
+
+    <div class="card" id="round-matches-card" style="display:none;">
+      <div class="card-head">
+        <div class="card-head-title" id="round-matches-title">คู่ที่ติดกัน</div>
+        <button class="btn-sm" onclick="closeRoundMatches()">✕ ปิด</button>
+      </div>
+      <div class="tbl-wrap">
+        <table>
+          <thead>
+            <tr><th>Match ID</th><th>ผู้โพสต์</th><th>ผู้ติด</th><th>จำนวน</th><th>สถานะ</th><th>เวลา</th></tr>
+          </thead>
+          <tbody id="round-matches-body"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAGE: PROFIT -->
+  <div class="page" id="page-profit">
+    <div class="stat-grid" style="grid-template-columns:repeat(2,1fr);">
+      <div class="stat-card">
+        <div class="stat-label">💰 กำไรสะสมทั้งหมด</div>
+        <div class="stat-value c-green" id="p-total">—</div>
+        <div class="stat-sub">เครดิต (หัก % อัตโนมัติ)</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">📋 จำนวนรอบที่มีกำไร</div>
+        <div class="stat-value c-yellow" id="p-rounds">—</div>
+        <div class="stat-sub">รอบที่มีการคิดกำไร</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <div class="card-head-title">📋 ประวัติกำไรแต่ละรอบ</div>
+      </div>
+      <div class="card-body">
+        <div class="profit-rounds" id="profit-rounds-list">
+          <div class="loading"><div class="spinner"></div>กำลังโหลด...</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /content -->
+
+<!-- STATUSBAR -->
+<div class="statusbar">
+  <div class="statusbar-item">🔗 API: <span id="sb-url">—</span></div>
+  <div class="statusbar-item">📡 Stream: <span id="sb-stream">—</span></div>
+  <div class="statusbar-item" style="margin-left:auto;">อัปเดต: <span id="sb-ts">—</span></div>
+</div>
+
+</div><!-- /app -->
+
+<!-- MODALS -->
+
+<!-- Credit Adjust Modal -->
+<div class="modal-backdrop" id="creditModal">
+  <div class="modal">
+    <h3 id="creditModalTitle">ปรับเครดิต</h3>
+    <p id="creditModalDesc">กรุณาใส่จำนวนเครดิต</p>
+    <div class="modal-field">
+      <label>จำนวนเครดิต (ใส่ - เพื่อหัก เช่น -500)</label>
+      <input type="number" id="creditAmount" placeholder="500" />
+    </div>
+    <div class="modal-field">
+      <label>เหตุผล (ไม่บังคับ)</label>
+      <input type="text" id="creditReason" placeholder="admin_adjust" />
+    </div>
+    <div class="modal-btns">
+      <button class="modal-btn-cancel" onclick="closeModal('creditModal')">ยกเลิก</button>
+      <button class="modal-btn-confirm" onclick="doAdjustCredit()">ยืนยัน</button>
+    </div>
+  </div>
+</div>
+
+<!-- Delete User Modal -->
+<div class="modal-backdrop" id="deleteModal">
+  <div class="modal">
+    <h3>🗑️ ลบสมาชิก</h3>
+    <p id="deleteModalDesc">ต้องการลบสมาชิกนี้ใช่หรือไม่? การกระทำนี้ไม่สามารถย้อนกลับได้</p>
+    <div class="modal-btns">
+      <button class="modal-btn-cancel" onclick="closeModal('deleteModal')">ยกเลิก</button>
+      <button class="modal-btn-danger" onclick="doDeleteUser()">ลบสมาชิก</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div id="toast"></div>
+
+<script>
+// ======================================================
+// CONFIG
+// ======================================================
+let API_BASE = localStorage.getItem('bot_api_base') || '';
+let SECRET_TOKEN = localStorage.getItem('bot_secret_token') || '';
+let currentPage = 1;
+let totalPages = 1;
+let activeTab = 'dashboard';
+let pendingAction = null; // {type, userId, ...}
+let sseSource = null;
+let debounceTimer = null;
+
+function saveConfig() {
+  const url = document.getElementById('cfgUrl').value.trim().replace(/\/$/, '');
+  const token = document.getElementById('cfgToken').value.trim();
+  if (!url || !token) { showToast('กรุณาใส่ URL และ Token', 'error'); return; }
+  API_BASE = url;
+  SECRET_TOKEN = token;
+  localStorage.setItem('bot_api_base', url);
+  localStorage.setItem('bot_secret_token', token);
+  document.getElementById('configOverlay').style.display = 'none';
+  document.getElementById('appContainer').style.display = 'flex';
+  document.getElementById('sb-url').textContent = url.replace('https://','').replace('http://','');
+  init();
+}
+
+function openConfig() {
+  document.getElementById('cfgUrl').value = API_BASE;
+  document.getElementById('cfgToken').value = SECRET_TOKEN;
+  document.getElementById('configOverlay').style.display = 'flex';
+  document.getElementById('appContainer').style.display = 'none';
+}
+
+// ======================================================
+// API CALL
+// ======================================================
+async function apiFetch(path, options = {}) {
+  const url = `${API_BASE}${path}`;
+  const resp = await fetch(url, {
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Dashboard-Token': SECRET_TOKEN,
+      ...(options.headers || {}),
+    },
+  });
+  if (!resp.ok) {
+    const err = await resp.json().catch(() => ({}));
+    throw new Error(err.error || `HTTP ${resp.status}`);
+  }
+  return resp.json();
+}
+
+// ======================================================
+// TOAST
+// ======================================================
+function showToast(msg, type = 'info') {
+  const div = document.createElement('div');
+  div.className = `toast-item toast-${type}`;
+  div.textContent = msg;
+  document.getElementById('toast').appendChild(div);
+  setTimeout(() => div.remove(), 3500);
+}
+
+// ======================================================
+// CONN BADGE
+// ======================================================
+function setConnBadge(state) {
+  const b = document.getElementById('connBadge');
+  const t = document.getElementById('connText');
+  b.className = `conn-badge ${state}`;
+  t.textContent = state === 'connected' ? 'เชื่อมต่อแล้ว' : state === 'connecting' ? 'กำลังเชื่อมต่อ' : 'ตัดการเชื่อมต่อ';
+}
+
+// ======================================================
+// SSE STREAM
+// ======================================================
+function startStream() {
+  if (sseSource) { sseSource.close(); sseSource = null; }
+  const url = `${API_BASE}/dashboard/api/stream?token=${SECRET_TOKEN}`;
+  sseSource = new EventSource(url);
+  document.getElementById('sb-stream').textContent = 'เปิดอยู่';
+  setConnBadge('connecting');
+
+  sseSource.onopen = () => { setConnBadge('connected'); };
+
+  sseSource.onmessage = (e) => {
+    try {
+      if (e.data.startsWith(':')) return;
+      const d = JSON.parse(e.data);
+      updateDashboard(d);
+      document.getElementById('sb-ts').textContent = new Date(d.ts).toLocaleTimeString('th-TH');
+    } catch(err) {}
+  };
+
+  sseSource.onerror = () => {
+    setConnBadge('disconnected');
+    document.getElementById('sb-stream').textContent = 'หลุด – รอเชื่อมใหม่';
+    sseSource.close();
+    setTimeout(startStream, 5000);
+  };
+}
+
+// ======================================================
+// DASHBOARD PAGE
+// ======================================================
+function updateDashboard(d) {
+  setText('s-total-users', fmt(d.total_users));
+  setText('s-active-users', fmt(d.active_users));
+  setText('s-total-credit', fmt(d.total_credit));
+  setText('s-total-profit', fmt(d.total_profit));
+  setText('s-open-rounds', fmt(d.open_rounds));
+  setText('s-total-bets', fmt(d.total_bets));
+
+  const top5 = d.top5 || [];
+  const tbody = document.getElementById('top5-body');
+  if (!top5.length) {
+    tbody.innerHTML = '<tr><td colspan="5"><div class="empty"><div class="empty-icon">👥</div>ยังไม่มีสมาชิก</div></td></tr>';
+    return;
+  }
+  tbody.innerHTML = top5.map((u, i) => `
+    <tr>
+      <td class="mono">${i+1}</td>
+      <td>${esc(u.name)}</td>
+      <td class="mono" style="font-size:10px;color:var(--muted)">${u.user_id.substring(0,12)}...</td>
+      <td class="mono"><span style="color:var(--green);font-weight:700">${fmt(u.credit)}</span></td>
+      <td>${u.is_friend ? '<span class="badge badge-green">เพื่อน</span>' : '<span class="badge badge-gray">-</span>'}</td>
+    </tr>
+  `).join('');
+
+  document.getElementById('last-update-badge').textContent = '● Live ' + new Date().toLocaleTimeString('th-TH');
+}
+
+// ======================================================
+// USERS PAGE
+// ======================================================
+let loadUsersTimer = null;
+function debounceLoadUsers() {
+  clearTimeout(loadUsersTimer);
+  loadUsersTimer = setTimeout(() => { currentPage = 1; loadUsers(); }, 350);
+}
+
+async function loadUsers() {
+  const q = document.getElementById('userSearch').value;
+  const sort = document.getElementById('userSort').value;
+  const order = document.getElementById('userOrder').value;
+  const tbody = document.getElementById('users-body');
+  tbody.innerHTML = '<tr><td colspan="7"><div class="loading"><div class="spinner"></div>กำลังโหลด...</div></td></tr>';
+
+  try {
+    const params = new URLSearchParams({ q, sort, order, page: currentPage, per_page: 50 });
+    const res = await apiFetch(`/dashboard/api/users?${params}`);
+    const users = res.data || [];
+    const meta = res.meta || {};
+    totalPages = meta.pages || 1;
+
+    document.getElementById('users-count-badge').textContent = `ทั้งหมด ${fmt(meta.total)} คน`;
+
+    if (!users.length) {
+      tbody.innerHTML = '<tr><td colspan="7"><div class="empty"><div class="empty-icon">🔍</div>ไม่พบสมาชิก</div></td></tr>';
+    } else {
+      tbody.innerHTML = users.map(u => `
+        <tr>
+          <td class="mono" style="color:var(--muted)">${u.member_no}</td>
+          <td>
+            ${u.picture_url ? `<img src="${u.picture_url}" style="width:22px;height:22px;border-radius:50%;margin-right:6px;vertical-align:middle;" onerror="this.style.display='none'">` : ''}
+            <strong>${esc(u.name)}</strong>
+          </td>
+          <td class="mono" style="font-size:10px;color:var(--muted)">${u.user_id}</td>
+          <td class="mono">
+            <span style="color:${u.credit > 0 ? 'var(--green)' : 'var(--muted)'}; font-weight:700">${fmt(u.credit)}</span>
+          </td>
+          <td>${u.is_friend ? '<span class="badge badge-green">✓</span>' : '<span class="badge badge-gray">-</span>'}</td>
+          <td style="color:var(--muted);font-size:11px">${u.last_seen_at}</td>
+          <td>
+            <div style="display:flex;gap:4px;">
+              <button class="btn-act btn-add-credit" onclick="openCreditModal('${u.user_id}','${esc(u.name)}','add')">+ เครดิต</button>
+              <button class="btn-act btn-sub-credit" onclick="openCreditModal('${u.user_id}','${esc(u.name)}','sub')">- เครดิต</button>
+              <button class="btn-act btn-del" onclick="openDeleteModal('${u.user_id}','${esc(u.name)}',${u.credit})">ลบ</button>
+            </div>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    renderPagination(meta);
+  } catch(err) {
+    tbody.innerHTML = `<tr><td colspan="7"><div class="empty"><div class="empty-icon">❌</div>${err.message}</div></td></tr>`;
+    showToast('โหลด users ไม่ได้: ' + err.message, 'error');
+  }
+}
+
+function renderPagination(meta) {
+  const pg = document.getElementById('users-pagination');
+  if (!meta || meta.pages <= 1) { pg.innerHTML = ''; return; }
+  let html = '';
+  const p = meta.page, total = meta.pages;
+  html += `<button class="page-btn" onclick="goPage(${p-1})" ${p<=1?'disabled':''}>‹</button>`;
+  for (let i = Math.max(1,p-2); i <= Math.min(total,p+2); i++) {
+    html += `<button class="page-btn ${i===p?'active':''}" onclick="goPage(${i})">${i}</button>`;
+  }
+  html += `<button class="page-btn" onclick="goPage(${p+1})" ${p>=total?'disabled':''}>›</button>`;
+  html += `<span class="page-info">หน้า ${p} / ${total} (${fmt(meta.total)} คน)</span>`;
+  pg.innerHTML = html;
+}
+
+function goPage(p) {
+  if (p < 1 || p > totalPages) return;
+  currentPage = p;
+  loadUsers();
+}
+
+// ======================================================
+// CREDIT MODAL
+// ======================================================
+function openCreditModal(userId, name, mode) {
+  pendingAction = { type: 'credit', userId, mode };
+  document.getElementById('creditModalTitle').textContent = mode === 'add' ? `➕ เติมเครดิต — ${name}` : `➖ หักเครดิต — ${name}`;
+  document.getElementById('creditModalDesc').textContent = mode === 'add' ? 'ใส่จำนวนเครดิตที่ต้องการเติม' : 'ใส่จำนวนเครดิตที่ต้องการหัก (ตัวเลขบวก ระบบจะหักให้)';
+  document.getElementById('creditAmount').value = '';
+  document.getElementById('creditReason').value = 'admin_dashboard';
+  document.getElementById('creditModal').classList.add('show');
+  setTimeout(() => document.getElementById('creditAmount').focus(), 100);
+}
+
+async function doAdjustCredit() {
+  const amtRaw = parseInt(document.getElementById('creditAmount').value);
+  const reason = document.getElementById('creditReason').value || 'admin_dashboard';
+  if (isNaN(amtRaw) || amtRaw === 0) { showToast('กรุณาใส่จำนวนที่ถูกต้อง', 'error'); return; }
+
+  const { userId, mode } = pendingAction;
+  const delta = mode === 'sub' ? -Math.abs(amtRaw) : Math.abs(amtRaw);
+
+  try {
+    const res = await apiFetch(`/dashboard/api/users/${userId}/credit`, {
+      method: 'POST',
+      body: JSON.stringify({ amount: delta, reason })
+    });
+    const d = res.data;
+    showToast(`✅ ปรับเครดิต ${d.old_credit} → ${d.new_credit} (${delta > 0 ? '+' : ''}${delta})`, 'success');
+    closeModal('creditModal');
+    loadUsers();
+  } catch(err) {
+    showToast('❌ ' + err.message, 'error');
+  }
+}
+
+// ======================================================
+// DELETE MODAL
+// ======================================================
+function openDeleteModal(userId, name, credit) {
+  pendingAction = { type: 'delete', userId, credit };
+  document.getElementById('deleteModalDesc').textContent =
+    credit > 0
+      ? `⚠️ ${name} มีเครดิต ${fmt(credit)} อยู่ ถ้ายืนยันลบจะถูกลบทันที`
+      : `ต้องการลบ "${name}" ใช่หรือไม่?`;
+  document.getElementById('deleteModal').classList.add('show');
+}
+
+async function doDeleteUser() {
+  const { userId, credit } = pendingAction;
+  try {
+    await apiFetch(`/dashboard/api/users/${userId}`, {
+      method: 'DELETE',
+      body: JSON.stringify({ force: true })
+    });
+    showToast('✅ ลบสมาชิกแล้ว', 'success');
+    closeModal('deleteModal');
+    loadUsers();
+  } catch(err) {
+    showToast('❌ ' + err.message, 'error');
+  }
+}
+
+function closeModal(id) {
+  document.getElementById(id).classList.remove('show');
+  pendingAction = null;
+}
+
+// ======================================================
+// ROUNDS PAGE
+// ======================================================
+async function loadRounds() {
+  const container = document.getElementById('round-cards');
+  container.innerHTML = '<div class="loading"><div class="spinner"></div>กำลังโหลด...</div>';
+  try {
+    const res = await apiFetch('/dashboard/api/rounds');
+    const rounds = res.data || [];
+    if (!rounds.length) {
+      container.innerHTML = '<div class="empty"><div class="empty-icon">🎯</div>ยังไม่มีรอบในระบบ</div>';
+      return;
+    }
+    container.innerHTML = rounds.map(r => `
+      <div class="round-card" onclick="loadRoundMatches('${r.round_id}', '${esc(r.camp_name)}')">
+        <div class="round-card-name">${esc(r.camp_name)}</div>
+        <div class="round-card-meta">${statusBadge(r.status)} ฐาน ${r.base_no}</div>
+        <div class="round-card-meta" style="margin-top:4px">ราคา: ${r.price_text || '-'} ${r.result ? `| ผล: ${r.result}` : ''}</div>
+        <div class="round-card-stat">
+          <span class="badge badge-blue">คู่รอ: ${r.matched_count}</span>
+          <span class="badge badge-green">คิดแล้ว: ${r.settled_count}</span>
+          <span class="badge badge-yellow">${fmt(r.total_amount)} cr</span>
+        </div>
+      </div>
+    `).join('');
+  } catch(err) {
+    container.innerHTML = `<div class="empty"><div class="empty-icon">❌</div>${err.message}</div>`;
+    showToast('โหลดรอบไม่ได้: ' + err.message, 'error');
+  }
+}
+
+async function loadRoundMatches(roundId, campName) {
+  if (!roundId) return;
+  const card = document.getElementById('round-matches-card');
+  const tbody = document.getElementById('round-matches-body');
+  card.style.display = 'block';
+  document.getElementById('round-matches-title').textContent = `🎯 คู่ที่ติดกัน — ค่าย: ${campName}`;
+  tbody.innerHTML = '<tr><td colspan="6"><div class="loading"><div class="spinner"></div>กำลังโหลด...</div></td></tr>';
+  card.scrollIntoView({ behavior: 'smooth' });
+
+  try {
+    const res = await apiFetch(`/dashboard/api/rounds/${roundId}/matches`);
+    const matches = res.data || [];
+    if (!matches.length) {
+      tbody.innerHTML = '<tr><td colspan="6"><div class="empty">ยังไม่มีคู่</div></td></tr>';
+      return;
+    }
+    tbody.innerHTML = matches.map(m => `
+      <tr>
+        <td class="mono" style="font-size:10px;color:var(--muted)">${m.match_id.substring(0,8)}…</td>
+        <td>${esc(m.maker_name)}</td>
+        <td>${esc(m.taker_name)}</td>
+        <td class="mono" style="color:var(--yellow);font-weight:700">${fmt(m.amount)}</td>
+        <td>${matchStatusBadge(m.status)}</td>
+        <td style="font-size:10.5px;color:var(--muted)">${m.created_at}</td>
+      </tr>
+    `).join('');
+  } catch(err) {
+    tbody.innerHTML = `<tr><td colspan="6"><div class="empty">❌ ${err.message}</div></td></tr>`;
+  }
+}
+
+function closeRoundMatches() {
+  document.getElementById('round-matches-card').style.display = 'none';
+}
+
+// ======================================================
+// PROFIT PAGE
+// ======================================================
+async function loadProfit() {
+  try {
+    const res = await apiFetch('/dashboard/api/profit');
+    const d = res.data;
+    setText('p-total', fmt(d.total_profit));
+    setText('p-rounds', fmt(d.rounds?.length || 0));
+
+    const list = document.getElementById('profit-rounds-list');
+    const rounds = d.rounds || [];
+    if (!rounds.length) {
+      list.innerHTML = '<div class="empty"><div class="empty-icon">💰</div>ยังไม่มีประวัติกำไร</div>';
+      return;
+    }
+    list.innerHTML = rounds.map(r => `
+      <div class="profit-row">
+        <div>
+          <div class="profit-camp">${esc(r.camp_name || '-')}</div>
+          <div class="profit-result">ราคา: ${r.open_price || '-'} | ผล: ${r.result ?? '-'} | ${r.created_at || ''}</div>
+        </div>
+        <div style="text-align:right">
+          <div class="profit-amount">+${fmt(r.profit)}</div>
+          <div style="font-size:10px;color:var(--muted)">${r.commission_percent}% commission</div>
+        </div>
+      </div>
+    `).join('');
+  } catch(err) {
+    showToast('โหลดกำไรไม่ได้: ' + err.message, 'error');
+  }
+}
+
+// ======================================================
+// TAB SWITCHING
+// ======================================================
+function switchTab(tab) {
+  activeTab = tab;
+  document.querySelectorAll('.nav-tab').forEach((t, i) => {
+    const tabs = ['dashboard','users','rounds','profit'];
+    t.classList.toggle('active', tabs[i] === tab);
+  });
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById(`page-${tab}`).classList.add('active');
+
+  if (tab === 'users') loadUsers();
+  else if (tab === 'rounds') loadRounds();
+  else if (tab === 'profit') loadProfit();
+}
+
+// ======================================================
+// HELPERS
+// ======================================================
+function fmt(n) { return (n ?? 0).toLocaleString('th-TH'); }
+function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function setText(id, val) { const el = document.getElementById(id); if (el) el.textContent = val; }
+
+function statusBadge(s) {
+  if (s === 'เปิดรับอยู่') return '<span class="badge badge-green">🟢 เปิดรับ</span>';
+  if (s === 'ปิดแล้ว / รอผล') return '<span class="badge badge-yellow">🟡 รอผล</span>';
+  if (s === 'แจ้งผลแล้ว') return '<span class="badge badge-purple">✓ คิดแล้ว</span>';
+  return '<span class="badge badge-gray">' + esc(s) + '</span>';
+}
+
+function matchStatusBadge(s) {
+  if (s === 'matched') return '<span class="badge badge-blue">ติดแล้ว</span>';
+  if (s === 'settled') return '<span class="badge badge-green">คิดแล้ว</span>';
+  if (s === 'cancelled') return '<span class="badge badge-red">ยกเลิก</span>';
+  return '<span class="badge badge-gray">' + esc(s||'-') + '</span>';
+}
+
+// ======================================================
+// INIT
+// ======================================================
+function init() {
+  document.getElementById('topbarSub').textContent = 'เชื่อมต่อแล้ว';
+  startStream();
+}
+
+// Load config on startup
+window.addEventListener('load', () => {
+  if (API_BASE && SECRET_TOKEN) {
+    document.getElementById('cfgUrl').value = API_BASE;
+    document.getElementById('cfgToken').value = SECRET_TOKEN;
+    document.getElementById('configOverlay').style.display = 'none';
+    document.getElementById('appContainer').style.display = 'flex';
+    document.getElementById('sb-url').textContent = API_BASE.replace('https://','').replace('http://','');
+    init();
+  }
+});
+
+// Enter key in config
+document.getElementById('cfgToken').addEventListener('keydown', e => { if (e.key === 'Enter') saveConfig(); });
+document.getElementById('cfgUrl').addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('cfgToken').focus(); });
+
+// Enter key in credit modal
+document.getElementById('creditAmount').addEventListener('keydown', e => { if (e.key === 'Enter') doAdjustCredit(); });
+
+// Close modals on backdrop click
+document.querySelectorAll('.modal-backdrop').forEach(backdrop => {
+  backdrop.addEventListener('click', e => { if (e.target === backdrop) closeModal(backdrop.id); });
+});
+</script>
+</body>
+</html>
