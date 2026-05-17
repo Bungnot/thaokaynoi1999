@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ThaokayNoi Management Admin</title>
+<title>Chatbot Management System</title>
 <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -142,7 +142,8 @@ tr:hover td{background:#ffffff03}
 .bgr{background:var(--bg4);color:var(--text2);border-color:var(--border)}
 
 /* AVATAR */
-.av{width:26px;height:26px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:.6rem;font-weight:700;flex-shrink:0}
+.av{width:26px;height:26px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:.6rem;font-weight:700;flex-shrink:0;overflow:hidden}
+.av img{width:100%;height:100%;object-fit:cover;display:block}
 
 /* BTNS */
 .btn{padding:.35rem .75rem;border:1px solid var(--border2);border-radius:var(--radius);font-family:'Sarabun',sans-serif;font-size:.75rem;cursor:pointer;transition:all .13s;display:inline-flex;align-items:center;gap:.3rem;background:transparent}
@@ -583,6 +584,16 @@ const $=id=>document.getElementById(id);
 const fmt=n=>(n||0).toLocaleString('th-TH');
 const fmtD=s=>{if(!s||s==='-')return '-';try{return new Date(s).toLocaleString('th-TH',{dateStyle:'short',timeStyle:'short'})}catch{return s}};
 const esc=s=>String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const avPal=[['#00ff8825','#00ff88'],['#00b4ff25','#00b4ff'],['#a855f725','#a855f7'],['#ff8c0025','#ff8c00'],['#ffd70025','#ffd700']];
+function pickProfilePic(u){return u.picture_url||u.pictureUrl||u.profile_pic||u.profilePic||u.avatar_url||u.avatarUrl||u.picture||''}
+function avatarHtml(u,i=0,sz='26px'){
+  const p=avPal[i%avPal.length];
+  const init=(u.name||u.display_name||'?').substring(0,2).toUpperCase();
+  const pic=pickProfilePic(u);
+  if(pic)return `<div class="av" data-initial="${esc(init)}" style="width:${sz};height:${sz};background:${p[0]};color:${p[1]};border:1px solid ${p[1]}44"><img src="${esc(pic)}" alt="${esc(u.name||'LINE profile')}" referrerpolicy="no-referrer" onerror="this.remove();this.parentElement.textContent=this.parentElement.dataset.initial"></div>`;
+  return `<div class="av" style="width:${sz};height:${sz};background:${p[0]};color:${p[1]};border:1px solid ${p[1]}44">${esc(init)}</div>`;
+}
+
 
 // ========== SAVED ACCOUNTS ==========
 const STORAGE_KEY='bot_accounts';
@@ -676,7 +687,7 @@ async function loadOverview(){
     if(rr.ok){const open=(rr.data||[]).filter(x=>x.opened&&!x.settled);$('s-rounds').textContent=fmt((rr.data||[]).length);$('s-open').textContent='รอปิด/ยืนยัน: '+fmt(open.length);renderOvRounds(open.slice(0,4));}
   }catch(e){console.error(e)}
 }
-function renderTop5(list){const rc=['r1','r2','r3','rn','rn'];$('top5').innerHTML=list.map((u,i)=>`<div class="mrow"><div class="mrank ${rc[i]||'rn'}">${i+1}</div><div class="minfo"><div class="mname">${esc(u.name||u.user_id)}</div><div class="mid_">${(u.user_id||'').substring(0,12)}...</div></div><div style="text-align:right"><div class="${(u.credit||0)===0?'mcredit0':'mcredit'}">${fmt(u.credit||0)}</div><div style="font-size:.6rem;color:var(--text3)">เครดิต</div></div></div>`).join('')}
+function renderTop5(list){const rc=['r1','r2','r3','rn','rn'];$('top5').innerHTML=list.map((u,i)=>`<div class="mrow"><div class="mrank ${rc[i]||'rn'}">${i+1}</div>${avatarHtml(u,i,'24px')}<div class="minfo"><div class="mname">${esc(u.name||u.user_id)}</div><div class="mid_">${(u.user_id||'').substring(0,12)}...</div></div><div style="text-align:right"><div class="${(u.credit||0)===0?'mcredit0':'mcredit'}">${fmt(u.credit||0)}</div><div style="font-size:.6rem;color:var(--text3)">เครดิต</div></div></div>`).join('')}
 function renderOvRounds(rounds){
   if(!rounds.length){$('ov-rounds').innerHTML='<div class="empty">ไม่มีรอบที่เปิดอยู่</div>';return}
   $('ov-rounds').innerHTML=rounds.map(r=>`<div class="rmini open" onclick="openRoundDet('${esc(r.round_id||r.base_no)}','${esc(r.camp_name||r.base_no)}')"><div class="rmini-top"><span class="rname">${esc(r.camp_name||r.base_no)}</span><span class="badge bg_">● เปิดอยู่</span></div><div class="rstats"><span>ค่าย <span class="rv">${esc(r.camp_name||'-')}</span></span><span>คู่ <span class="rv">${fmt(r.match_count||0)}</span></span><span>ยอด <span class="rv" style="color:var(--yellow)">${fmt(r.total_amount||0)}</span></span></div></div>`).join('');
@@ -694,9 +705,8 @@ async function loadUsers(){
 function debSearch(){clearTimeout(uSearchT);uPage=1;uSearchT=setTimeout(loadUsers,380)}
 function renderUsers(users){
   if(!users.length){$('u-tbody').innerHTML='<tr><td colspan="7"><div class="empty">ไม่พบสมาชิก</div></td></tr>';return}
-  const pal=[['#00ff8825','#00ff88'],['#00b4ff25','#00b4ff'],['#a855f725','#a855f7'],['#ff8c0025','#ff8c00'],['#ffd70025','#ffd700']];
-  $('u-tbody').innerHTML=users.map((u,i)=>{const cr=u.credit||0;const p=pal[i%pal.length];const init=(u.name||'?').substring(0,2).toUpperCase();const cc=cr>1000?'var(--neon)':cr>100?'var(--yellow)':'var(--text2)';
-    return `<tr><td class="mono" style="color:var(--text3)">${u.member_no||'-'}</td><td><div style="display:flex;align-items:center;gap:.55rem"><div class="av" style="background:${p[0]};color:${p[1]};border:1px solid ${p[1]}44">${init}</div><div><div style="font-weight:600;font-size:.78rem">${esc(u.name||u.user_id)}</div><div class="mono" style="color:var(--text3)">${(u.user_id||'').substring(0,13)}...</div></div></div></td>
+  $('u-tbody').innerHTML=users.map((u,i)=>{const cr=u.credit||0;const cc=cr>1000?'var(--neon)':cr>100?'var(--yellow)':'var(--text2)';
+    return `<tr><td class="mono" style="color:var(--text3)">${u.member_no||'-'}</td><td><div style="display:flex;align-items:center;gap:.55rem">${avatarHtml(u,i)}<div><div style="font-weight:600;font-size:.78rem">${esc(u.name||u.user_id)}</div><div class="mono" style="color:var(--text3)">${(u.user_id||'').substring(0,13)}...</div></div></div></td>
     <td><span style="font-family:'JetBrains Mono',monospace;font-weight:700;color:${cc}">${fmt(cr)}</span></td>
     <td style="color:var(--text2)">#${u.member_no||'-'}</td><td style="color:var(--text3);font-size:.7rem">${fmtD(u.last_seen_at)}</td>
     <td>${cr>0?'<span class="badge bg_">● มีเครดิต</span>':'<span class="badge bgr">○ ไม่มี</span>'}</td>
@@ -833,8 +843,8 @@ async function loadAdmUsers(){
 }
 function renderAdmUsers(){
   if(!admAllUsers.length){$('adm-u-tbody').innerHTML='<tr><td colspan="4"><div class="empty">ไม่พบสมาชิก</div></td></tr>';return}
-  $('adm-u-tbody').innerHTML=admAllUsers.map(u=>`<tr>
-    <td><div style="font-weight:600;font-size:.78rem">${esc(u.name||u.user_id)}</div><div class="mono" style="color:var(--text3)">${(u.user_id||'').substring(0,14)}...</div></td>
+  $('adm-u-tbody').innerHTML=admAllUsers.map((u,i)=>`<tr>
+    <td><div style="display:flex;align-items:center;gap:.55rem">${avatarHtml(u,i)}<div><div style="font-weight:600;font-size:.78rem">${esc(u.name||u.user_id)}</div><div class="mono" style="color:var(--text3)">${(u.user_id||'').substring(0,14)}...</div></div></div></td>
     <td style="font-family:'JetBrains Mono',monospace;color:var(--neon)">${fmt(u.credit||0)}</td>
     <td>${(u.credit||0)>0?'<span class="badge bg_">● มีเครดิต</span>':'<span class="badge bgr">○ ไม่มี</span>'}</td>
     <td><button class="abtn" onclick="addAdmin('${esc(u.user_id)}','${esc(u.name||u.user_id)}')">+ แอดมิน</button></td>
