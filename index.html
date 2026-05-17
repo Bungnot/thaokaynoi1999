@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Bot Admin Dashboard</title>
+<title>Bot Admin Dashboardป</title>
 <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -542,7 +542,7 @@ function showApp(){
 // ============ API ============
 async function apiFetch(path,opts={}){
   const url=BASE_URL+path;
-  const headers={'Content-Type':'application/json','Authorization':'Bearer '+TOKEN,...(opts.headers||{})};
+  const headers={'Content-Type':'application/json','X-Dashboard-Token':TOKEN,...(opts.headers||{})};
   const res=await fetch(url,{...opts,headers});
   if(res.status===401)throw new Error('Unauthorized');
   return res.json();
