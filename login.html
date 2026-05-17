@@ -542,7 +542,7 @@ function showApp(){
 // ============ API ============
 async function apiFetch(path,opts={}){
   const url=BASE_URL+path;
-  const headers={'Content-Type':'application/json','Authorization':'Bearer '+TOKEN,...(opts.headers||{})};
+  const headers={'Content-Type':'application/json','X-Dashboard-Token':TOKEN,...(opts.headers||{})};
   const res=await fetch(url,{...opts,headers});
   if(res.status===401)throw new Error('Unauthorized');
   return res.json();
