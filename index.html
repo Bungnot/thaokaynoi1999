@@ -391,6 +391,17 @@ body::before{background:radial-gradient(ellipse at 20% 8%,var(--neon-dim),transp
 .cr-mini .amt{margin-left:auto;font-weight:900;font-family:'JetBrains Mono',monospace;color:var(--yellow)}
 @media (max-width:900px){.cr-grid3,.cr-stats{grid-template-columns:1fr}.cr-wide{gap:.75rem}}
 
+.abtn-withdraw{border-color:#f59e0b55!important;color:#f59e0b!important}
+.abtn-withdraw:hover{border-color:#f59e0b!important;box-shadow:0 0 10px #f59e0b44!important;background:#f59e0b18!important}
+
+/* ROUNDS TABLE ENHANCEMENTS */
+#r-tbody tr{border-bottom:1px solid var(--border);transition:background .15s}
+#r-tbody tr:hover{background:linear-gradient(90deg,var(--neon-dim),transparent 60%)!important}
+#r-tbody td:nth-child(3){min-width:130px}
+#r-tbody td:nth-child(5){min-width:120px}
+/* MODAL ROUND ENHANCED */
+#m-round .modal{width:640px;max-width:96vw}
+
 </style>
 </head>
 <body>
@@ -571,7 +582,7 @@ body::before{background:radial-gradient(ellipse at 20% 8%,var(--neon-dim),transp
           </div>
         </div>
         <div class="panel"><div class="twrap">
-          <table><thead><tr><th>ค่าย / ฐาน</th><th>สถานะ</th><th>คู่แทง</th><th>ยอดรวม</th><th>ผล</th><th>เปิดเมื่อ</th><th>ดูคู่</th></tr></thead>
+          <table><thead><tr><th>ค่าย / ฐาน</th><th>สถานะ</th><th>แผลสมบูรณ์ 🔗</th><th>ยอดรวม</th><th>ผลลัพธ์ 🎯</th><th>เปิดเมื่อ</th><th>รายละเอียด</th></tr></thead>
           <tbody id="r-tbody"></tbody></table>
         </div></div>
       </div>
@@ -747,6 +758,40 @@ body::before{background:radial-gradient(ellipse at 20% 8%,var(--neon-dim),transp
       <div class="frow"><label>User ID (LINE)</label><input type="text" id="adm-uid" placeholder="U1234567890..."></div>
     </div>
     <div class="mfoot"><button class="btn bgh" onclick="closeMod('m-add-admin')">ยกเลิก</button><button class="btn bng" onclick="submitAddAdmin()">+ เพิ่มแอดมิน</button></div>
+  </div>
+</div>
+
+<div class="modal-bg" id="m-withdraw">
+  <div class="modal" style="width:440px">
+    <div class="mhdr" style="border-bottom:1px solid #f59e0b44">
+      <h3 style="color:#f59e0b">💸 ยืนยันถอนเงิน</h3>
+      <button class="mx" onclick="closeMod('m-withdraw')">&#x2715;</button>
+    </div>
+    <div class="mbody">
+      <div style="background:#f59e0b12;border:1px solid #f59e0b44;border-radius:14px;padding:1rem;margin-bottom:.85rem;text-align:center">
+        <div style="font-size:.72rem;color:var(--text2);margin-bottom:.3rem">สมาชิก</div>
+        <div style="font-size:1rem;font-weight:700;color:var(--text)" id="wd-name">&#x2014;</div>
+        <div style="font-size:.7rem;color:var(--text3);margin-top:.15rem;font-family:'JetBrains Mono',monospace" id="wd-uid">&#x2014;</div>
+        <div style="margin-top:.65rem;padding-top:.55rem;border-top:1px solid #f59e0b33">
+          <div style="font-size:.68rem;color:var(--text2)">เครดิตที่จะหัก</div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:2rem;font-weight:900;color:#f59e0b" id="wd-credit">0</div>
+        </div>
+      </div>
+      <div style="background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:.75rem .85rem;font-size:.76rem;color:var(--text2);line-height:1.6">
+        <div style="font-weight:700;color:var(--text);margin-bottom:.35rem">ระบบจะทำการ:</div>
+        <div>&#x2705; ลบเครดิตทั้งหมด &#x2192; <strong style="color:#f59e0b">0</strong></div>
+        <div>&#x1F4E8; ส่งข้อความแจ้งลูกค้าทาง LINE ทันที</div>
+        <div style="margin-top:.45rem;padding:.5rem .65rem;background:var(--bg4);border-radius:8px;font-size:.72rem;color:var(--text);font-style:italic">
+          &#x1F4B0;&#x2705; ทำรายการถอนให้เสร็จเรียบร้อยครับ หมานๆนะครับพี่ &#x1F64F;
+        </div>
+      </div>
+    </div>
+    <div class="mfoot">
+      <button class="btn bgh" onclick="closeMod('m-withdraw')">ยกเลิก</button>
+      <button class="btn" id="wd-confirm-btn" style="background:#f59e0b18;border-color:#f59e0b55;color:#f59e0b;border-radius:999px" onclick="execWithdraw()">
+        &#x1F4B8; ยืนยันถอนเงิน
+      </button>
+    </div>
   </div>
 </div>
 
@@ -963,7 +1008,7 @@ function renderUsers(users){
     <td><span style="font-family:'JetBrains Mono',monospace;font-weight:700;color:${cc}">${fmt(cr)}</span></td>
     <td style="color:var(--text2)">#${u.member_no||'-'}</td><td style="color:var(--text3);font-size:.7rem">${fmtD(u.last_seen_at)}</td>
     <td>${cr>0?'<span class="badge bg_">● มีเครดิต</span>':'<span class="badge bgr">○ ไม่มี</span>'}</td>
-    <td><div style="display:flex;gap:.28rem"><button class="abtn" onclick="openUserDet('${esc(u.user_id)}')">ดู</button><button class="abtn" onclick="openCreditModal('${esc(u.user_id)}','${esc(u.name||'')}')">เครดิต</button><button class="abtn d" onclick="delUser('${esc(u.user_id)}','${esc(u.name||'')}',${cr})">ลบ</button></div></td></tr>`}).join('');
+    <td><div style="display:flex;gap:.28rem;flex-wrap:wrap"><button class="abtn" onclick="openUserDet('${esc(u.user_id)}')">ดู</button><button class="abtn" onclick="openCreditModal('${esc(u.user_id)}','${esc(u.name||'')}')">เครดิต</button>${cr>0?`<button class=\"abtn abtn-withdraw\" onclick=\"confirmWithdraw('${esc(u.user_id)}','${esc(u.name||u.user_id)}',${cr})\" style=\"border-color:#f59e0b55;color:#f59e0b\">💸 ถอน</button>`:`<button class=\"abtn\" disabled style=\"opacity:.3;cursor:not-allowed\">💸 ถอน</button>`}<button class="abtn d" onclick="delUser('${esc(u.user_id)}','${esc(u.name||'')}',${cr})">ลบ</button></div></td></tr>`}).join('');
 }
 function renderPager(meta){if(!meta){$('u-pager').innerHTML='';return}const{page,pages,total,per_page}=meta;const s=((page-1)*per_page)+1,e=Math.min(page*per_page,total);$('u-pager').innerHTML=`<span style="color:var(--text2);font-size:.7rem">${s}–${e} จาก ${fmt(total)}</span><div class="pgr-sp"></div><button class="pbtn" onclick="uGo(${page-1})" ${page<=1?'disabled':''}>‹</button>${[...Array(Math.min(5,pages))].map((_,i)=>{const p=Math.max(1,Math.min(pages-4,page-2))+i;return p<=pages?`<button class="pbtn ${p===page?'active':''}" onclick="uGo(${p})">${p}</button>`:''}).join('')}<button class="pbtn" onclick="uGo(${page+1})" ${page>=pages?'disabled':''}>›</button>`}
 function uGo(p){uPage=p;loadUsers()}
@@ -988,6 +1033,34 @@ async function openUserDet(uid){
 async function qCredit(uid,set){const amt=parseInt($('qc-amt').value);if(isNaN(amt))return;const path=set?`/dashboard/api/users/${encodeURIComponent(uid)}/credit/set`:`/dashboard/api/users/${encodeURIComponent(uid)}/credit`;try{const r=await api(path,{method:'POST',body:JSON.stringify({amount:amt,reason:'dashboard_quick'})});if(r.ok){toast('เครดิต: '+fmt(r.data.old_credit)+' → '+fmt(r.data.new_credit),'success');openUserDet(uid);loadUsers()}else toast(r.error||'ผิดพลาด','error')}catch(e){toast(e.message,'error')}}
 function openCreditModal(uid='',name=''){$('c-uid').value=uid;$('m-credit-title').textContent='ปรับเครดิต'+(name?' : '+name:'');$('c-amt').value='';$('c-reason').value='';openMod('m-credit')}
 async function submitCredit(){const uid=$('c-uid').value.trim(),amt=parseInt($('c-amt').value),reason=($('c-reason').value||'admin_dashboard').trim(),type=$('c-type').value;if(!uid){toast('ใส่ User ID ด้วย','error');return}if(isNaN(amt)){toast('ใส่จำนวนเครดิต','error');return}try{const path=type==='set'?`/dashboard/api/users/${encodeURIComponent(uid)}/credit/set`:`/dashboard/api/users/${encodeURIComponent(uid)}/credit`;const r=await api(path,{method:'POST',body:JSON.stringify({amount:amt,reason})});if(r.ok){toast('บันทึกสำเร็จ','success');closeMod('m-credit');loadUsers()}else toast(r.error||'ผิดพลาด','error')}catch(e){toast(e.message,'error')}}
+let wdPending={uid:'',name:'',credit:0};
+function confirmWithdraw(uid,name,credit){
+  if(credit<=0){toast('ไม่มีเครดิตให้ถอน','info');return}
+  wdPending={uid,name,credit};
+  $('wd-name').textContent=name||uid;
+  $('wd-uid').textContent=(uid||'').substring(0,24)+'...';
+  $('wd-credit').textContent=fmt(credit);
+  openMod('m-withdraw');
+}
+async function execWithdraw(){
+  const{uid,name,credit}=wdPending;
+  if(!uid)return;
+  const btn=$('wd-confirm-btn');
+  btn.disabled=true;btn.textContent='⏳ กำลังดำเนินการ...';
+  try{
+    const r=await api('/dashboard/api/users/'+encodeURIComponent(uid)+'/withdraw',{method:'POST'});
+    if(r.ok){
+      closeMod('m-withdraw');
+      const pushOk=r.data?.push_sent;
+      toast('✅ ถอนเงินสำเร็จ! เครดิต '+fmt(credit)+' → 0'+(pushOk?' · ส่ง LINE แล้ว':' · ⚠️ ส่ง LINE ไม่ได้'),'success');
+      loadUsers();
+    }else{
+      toast(r.error||'เกิดข้อผิดพลาด','error');
+    }
+  }catch(e){toast(e.message,'error')}
+  finally{btn.disabled=false;btn.innerHTML='&#x1F4B8; ยืนยันถอนเงิน';}
+}
+
 function delUser(uid,name,credit){if(!confirm(`ลบสมาชิก "${name||uid}"?\n${credit>0?'⚠️ ยังมีเครดิต '+fmt(credit)+' อยู่!':''}`))return;api('/dashboard/api/users/'+encodeURIComponent(uid),{method:'DELETE',body:JSON.stringify({force:credit>0})}).then(r=>{if(r.ok){toast('ลบสำเร็จ','success');loadUsers()}else toast(r.error||'ลบไม่ได้','error')}).catch(e=>toast(e.message,'error'))}
 
 // ========== ROUNDS ==========
@@ -997,14 +1070,77 @@ async function loadRounds(){
   catch{$('r-tbody').innerHTML='<tr><td colspan="7"><div class="empty">โหลดไม่ได้</div></td></tr>'}
 }
 function setRF(f){rf=f;['all','open','settled'].forEach(x=>{const b=$('rf-'+x);if(b)b.className='btn '+(x===f?'bng':'bgh')});renderRoundsTable()}
+function getRoundMatchCount(r){
+  const keys=['matched_count','match_count','total_matches','matches_count','confirmed_count','done_count','pairs_count','pair_count'];
+  for(const k of keys){const v=r[k];if(v!==undefined&&v!==null&&v!=='')return Number(v)||0}
+  return 0;
+}
+function getRoundResult(r){
+  const keys=['announced_result','result','winner','outcome','answer','result_value','declared_result'];
+  for(const k of keys){const v=r[k];if(v!==undefined&&v!==null&&v!==''&&v!=='-')return String(v)}
+  return null;
+}
 function renderRoundsTable(){
   let data=allRounds;
   if(rf==='open')data=data.filter(r=>r.opened&&!r.settled);
   if(rf==='settled')data=data.filter(r=>r.settled);
   if(!data.length){$('r-tbody').innerHTML='<tr><td colspan="7"><div class="empty">ไม่พบรอบ</div></td></tr>';return}
-  $('r-tbody').innerHTML=data.map(r=>{const io=r.opened&&!r.settled;return`<tr><td><div style="font-weight:600">${esc(r.camp_name||r.base_no)}</div><div class="mono" style="color:var(--text3)">${r.base_no}</div></td><td>${io?'<span class="badge bg_">● เปิดอยู่</span>':'<span class="badge bgr">○ ปิดแล้ว</span>'}</td><td class="mono">${fmt(r.match_count||0)}</td><td style="font-family:'JetBrains Mono',monospace;color:var(--yellow)">${fmt(r.total_amount||0)}</td><td>${r.winner?`<span class="badge bg_">${esc(r.winner)}</span>`:'<span style="color:var(--text3)">-</span>'}</td><td style="font-size:.7rem;color:var(--text3)">${fmtD(r.opened_at)}</td><td><button class="abtn" onclick="openRoundDet('${esc(r.round_id||r.base_no)}','${esc(r.camp_name||r.base_no)}')">ดูคู่</button></td></tr>`}).join('');
+  $('r-tbody').innerHTML=data.map(r=>{
+    const io=r.opened&&!r.settled;
+    const matchCnt=getRoundMatchCount(r);
+    const totalAmt=r.total_amount||r.total_bet||r.total_betting||0;
+    const result=getRoundResult(r);
+    const statusBadge=io
+      ?'<span class="badge bg_"><span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--neon);margin-right:3px;animation:blink 1.4s infinite"></span>เปิดอยู่</span>'
+      :(r.settled?'<span class="badge bgr">✓ ปิดแล้ว</span>':'<span class="badge bo_">⏸ รอผล</span>');
+    const matchBadge=matchCnt>0
+      ?`<span style="display:inline-flex;align-items:center;gap:.3rem;font-family:'JetBrains Mono',monospace;font-weight:700;color:var(--blue);font-size:.82rem">${matchCnt}<span style="font-size:.62rem;color:var(--text2);font-family:'Sarabun',sans-serif;font-weight:400"> แผลสมบูรณ์</span></span>`
+      :'<span style="color:var(--text3);font-size:.72rem">— ยังไม่มี</span>';
+    const resultCell=result
+      ?`<span style="display:inline-flex;align-items:center;gap:.28rem;background:var(--neon-dim);border:1px solid var(--neon-border);border-radius:999px;padding:.15rem .6rem;font-family:'JetBrains Mono',monospace;font-weight:800;font-size:.82rem;color:var(--neon)">🎯 ${esc(result)}</span>`
+      :'<span style="color:var(--text3);font-size:.72rem">รอแจ้งผล</span>';
+    return`<tr>
+      <td><div style="font-weight:700;font-size:.82rem">${esc(r.camp_name||r.base_no||'-')}</div><div class="mono" style="color:var(--text3);font-size:.63rem;margin-top:.1rem">ฐาน ${esc(r.base_no||'-')}</div></td>
+      <td>${statusBadge}</td>
+      <td>${matchBadge}</td>
+      <td style="font-family:'JetBrains Mono',monospace;color:var(--yellow);font-weight:700">${fmt(totalAmt)}</td>
+      <td>${resultCell}</td>
+      <td style="font-size:.7rem;color:var(--text3)">${fmtD(r.opened_at||r.created_at)}</td>
+      <td><button class="abtn" onclick="openRoundDet('${esc(r.round_id||r.base_no)}','${esc(r.camp_name||r.base_no)}')">🔍 ดูคู่</button></td>
+    </tr>`}).join('');
 }
-async function openRoundDet(rid,name){$('m-round-title').textContent='รอบ: '+name;$('m-round-body').innerHTML='<div class="loading"><div class="spin"></div></div>';openMod('m-round');try{const d=await api('/dashboard/api/rounds/'+encodeURIComponent(rid)+'/matches');const ms=d.data||[];$('m-round-body').innerHTML=ms.length?`<div style="font-size:.7rem;color:var(--text2);margin-bottom:.55rem">${fmt(ms.length)} คู่</div><table class="mtbl"><tr><th>Maker</th><th>Taker</th><th>จำนวน</th><th>สถานะ</th><th>เวลา</th></tr>${ms.map(m=>`<tr><td>${esc(m.maker_name||'-')}</td><td>${esc(m.taker_name||'-')}</td><td style="font-family:'JetBrains Mono',monospace;color:var(--yellow)">${fmt(m.amount)}</td><td>${sbadge(m.status)}</td><td style="font-size:.65rem;color:var(--text3)">${fmtD(m.created_at)}</td></tr>`).join('')}</table>`:'<div class="empty">ไม่มีคู่แทง</div>'}catch{$('m-round-body').innerHTML='<div class="empty">โหลดไม่ได้</div>'}}
+async function openRoundDet(rid,name){
+  $('m-round-title').textContent='รอบ: '+name;
+  $('m-round-body').innerHTML='<div class="loading"><div class="spin"></div></div>';
+  openMod('m-round');
+  try{
+    const d=await api('/dashboard/api/rounds/'+encodeURIComponent(rid)+'/matches');
+    const ms=d.data||[];
+    const roundInfo=allRounds.find(r=>(r.round_id||r.base_no)===rid)||{};
+    const result=getRoundResult(roundInfo);
+    const totalAmt=roundInfo.total_amount||roundInfo.total_bet||ms.reduce((s,m)=>s+(m.amount||0),0);
+    const matchCnt=getRoundMatchCount(roundInfo)||ms.length;
+    const summaryHtml=`<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:.55rem;margin-bottom:.85rem">
+      <div style="background:var(--blue-dim);border:1px solid #00b4ff28;border-radius:14px;padding:.72rem .7rem;text-align:center">
+        <div style="font-size:.62rem;color:var(--text2);margin-bottom:.2rem">แผลสมบูรณ์</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:1.5rem;font-weight:900;color:var(--blue)">${matchCnt}</div>
+      </div>
+      <div style="background:var(--neon-dim);border:1px solid var(--neon-border);border-radius:14px;padding:.72rem .7rem;text-align:center">
+        <div style="font-size:.62rem;color:var(--text2);margin-bottom:.2rem">ยอดรวม</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:1.1rem;font-weight:900;color:var(--neon)">${fmt(totalAmt)}</div>
+      </div>
+      <div style="background:${result?'var(--neon-dim)':'var(--bg3)'};border:1px solid ${result?'var(--neon-border)':'var(--border)'};border-radius:14px;padding:.72rem .7rem;text-align:center">
+        <div style="font-size:.62rem;color:var(--text2);margin-bottom:.2rem">ผลออก</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:1.5rem;font-weight:900;color:${result?'var(--neon)':'var(--text3)'}">${result||'—'}</div>
+      </div>
+    </div>`;
+    $('m-round-body').innerHTML=summaryHtml+(ms.length
+      ?`<div style="font-size:.7rem;font-weight:700;color:var(--text2);margin-bottom:.5rem;display:flex;align-items:center;gap:.4rem"><span>📋 รายการคู่แทง</span><span style="margin-left:auto;background:var(--bg3);border:1px solid var(--border);border-radius:999px;padding:.08rem .42rem;font-size:.62rem">${ms.length} รายการ</span></div>
+      <table class="mtbl"><thead><tr><th>Maker</th><th>Taker</th><th style="text-align:right">จำนวน</th><th>สถานะ</th><th>เวลา</th></tr></thead>
+      <tbody>${ms.map(m=>{const ok=m.status==='matched'||m.status==='confirmed'||m.status==='settled';return`<tr style="${ok?'background:rgba(0,180,255,.04)':''}"><td style="font-weight:600">${esc(m.maker_name||m.maker_id||'-')}</td><td style="font-weight:600">${esc(m.taker_name||m.taker_id||'-')}</td><td style="font-family:'JetBrains Mono',monospace;color:var(--yellow);font-weight:700;text-align:right">${fmt(m.amount)}</td><td>${sbadge(m.status)}</td><td style="font-size:.62rem;color:var(--text3)">${fmtD(m.created_at||m.matched_at)}</td></tr>`}).join('')}</tbody></table>`
+      :'<div class="empty">ไม่มีคู่แทงในรอบนี้</div>');
+  }catch(e){$('m-round-body').innerHTML='<div class="empty">โหลดไม่ได้: '+e.message+'</div>'}
+}
 
 // ========== PROFIT ==========
 async function loadProfit(){try{const d=await api('/dashboard/api/profit');const p=d.data;$('p-total').textContent=fmt(p.total_profit||0);$('p-updated').textContent='อัปเดต: '+fmtD(p.updated_at);$('p-cnt').textContent=fmt((p.rounds||[]).length);const rows=(p.rounds||[]).slice(0,50).reverse();$('p-tbody').innerHTML=rows.map(r=>`<tr><td class="mono" style="color:var(--text3)">${(r.round_id||'-').substring(0,14)}...</td><td>${esc(r.camp_name||r.base_no||'-')}</td><td style="font-family:'JetBrains Mono',monospace;font-weight:700;color:${(r.profit||0)>=0?'var(--neon)':'var(--red)'}">${(r.profit||0)>=0?'+':''}${fmt(r.profit||0)}</td><td style="font-size:.7rem;color:var(--text3)">${fmtD(r.settled_at)}</td></tr>`).join('')||'<tr><td colspan="4"><div class="empty">ไม่มีข้อมูล</div></td></tr>';drawPChart(rows);}catch{toast('โหลดกำไรไม่ได้','error')}}
