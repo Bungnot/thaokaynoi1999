@@ -1126,12 +1126,17 @@ async function loadBOGroups(force=false){
 }
 
 function boGroupLabel(g,i){
-  return g.name?g.name:'กลุ่ม '+(i+1)+' ('+(g.group_id||'').substring(0,10)+'...)';
+  const gid=(g&&g.group_id)||'';
+  if(g&&g.name)return g.name;
+  return 'กลุ่ม '+(i+1)+(gid?' ('+gid.substring(0,10)+'...)':'');
 }
 
 function buildBoGroupOpts(){
   if(!_boGroups.length)return '<option value="">ไม่พบกลุ่ม — กรุณาตั้ง BACKOFFICE_GROUP_ID</option>';
-  return _boGroups.map(function(g,i){return '<option value="'+g.group_id.replace(/"/g,'')+'">'+boGroupLabel(g,i)+'</option>';}).join('');
+  return _boGroups.map(function(g,i){
+    const gid=(g&&g.group_id)||'';
+    return '<option value="'+gid.replace(/"/g,'')+'">'+boGroupLabel(g,i)+'</option>';
+  }).join('');
 }
 
 async function openUserDet(uid){
