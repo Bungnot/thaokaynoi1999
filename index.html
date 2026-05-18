@@ -1120,22 +1120,28 @@ async function loadBOGroups(force=false){
   if(_boGroups.length&&!force)return;
   try{
     const d=await api('/dashboard/api/backoffice-groups');
-    const raw=d.data||[];
-    _boGroups=raw.map((g,i)=>typeof g==='string'?{group_id:g,name:''}:g);
-  }catch{_boGroups=[];}
+    const raw=Array.isArray(d.data)?d.data:[];
+    _boGroups=raw.map(function(g){
+      if(!g)return{group_id:'',name:''};
+      if(typeof g==='string')return{group_id:g,name:''};
+      return{group_id:String(g.group_id||''),name:String(g.name||'')};
+    }).filter(function(g){return g.group_id;});
+  }catch(e){console.warn('[loadBOGroups]',e);_boGroups=[];}
 }
 
 function boGroupLabel(g,i){
-  const gid=(g&&g.group_id)||'';
-  if(g&&g.name)return g.name;
+  if(!g)return 'กลุ่ม '+(i+1);
+  if(g.name)return g.name;
+  var gid=String(g.group_id||'');
   return 'กลุ่ม '+(i+1)+(gid?' ('+gid.substring(0,10)+'...)':'');
 }
 
 function buildBoGroupOpts(){
   if(!_boGroups.length)return '<option value="">ไม่พบกลุ่ม — กรุณาตั้ง BACKOFFICE_GROUP_ID</option>';
   return _boGroups.map(function(g,i){
-    const gid=(g&&g.group_id)||'';
-    return '<option value="'+gid.replace(/"/g,'')+'">'+boGroupLabel(g,i)+'</option>';
+    var gid=String(g.group_id||'');
+    var label=boGroupLabel(g,i);
+    return '<option value="'+gid.replace(/"/g,'')+'">'+(label||gid)+'</option>';
   }).join('');
 }
 
