@@ -586,7 +586,7 @@ body::before{background:radial-gradient(ellipse at 20% 8%,var(--neon-dim),transp
           </div>
         </div>
         <div class="panel"><div class="twrap">
-          <table><thead><tr><th>ค่าย / ฐาน</th><th>สถานะ</th><th>แผลสมบูรณ์ 🔗</th><th>ยอดรวม</th><th>ผลลัพธ์ 🎯</th><th>เปิดเมื่อ</th><th>รายละเอียด</th></tr></thead>
+          <table><thead><tr><th>ค่าย / ฐาน</th><th>สถานะ</th><th>แผลสมบูรณ์ 🔗</th><th>ราคาช่าง 💰</th><th>ยอดรวม</th><th>ผล 🎯</th><th>เปิดเมื่อ</th><th>รายละเอียด</th></tr></thead>
           <tbody id="r-tbody"></tbody></table>
         </div></div>
       </div>
@@ -1159,9 +1159,9 @@ function delUser(uid,name,credit){if(!confirm(`ลบสมาชิก "${name|
 
 // ========== ROUNDS ==========
 async function loadRounds(){
-  $('r-tbody').innerHTML='<tr><td colspan="7"><div class="loading"><div class="spin"></div></div></td></tr>';
+  $('r-tbody').innerHTML='<tr><td colspan="8"><div class="loading"><div class="spin"></div></div></td></tr>';
   try{const d=await api('/dashboard/api/rounds');allRounds=d.data||[];renderOvRounds(getCurrentRounds(allRounds));renderRoundsTable();}
-  catch{$('r-tbody').innerHTML='<tr><td colspan="7"><div class="empty">โหลดไม่ได้</div></td></tr>'}
+  catch{$('r-tbody').innerHTML='<tr><td colspan="8"><div class="empty">โหลดไม่ได้</div></td></tr>'}
 }
 function setRF(f){rf=f;['all','open','settled'].forEach(x=>{const b=$('rf-'+x);if(b)b.className='btn '+(x===f?'bng':'bgh')});renderRoundsTable()}
 function getRoundMatchCount(r){
@@ -1178,7 +1178,7 @@ function renderRoundsTable(){
   let data=allRounds;
   if(rf==='open')data=data.filter(r=>r.opened&&!r.settled);
   if(rf==='settled')data=data.filter(r=>r.settled);
-  if(!data.length){$('r-tbody').innerHTML='<tr><td colspan="7"><div class="empty">ไม่พบรอบ</div></td></tr>';return}
+  if(!data.length){$('r-tbody').innerHTML='<tr><td colspan="8"><div class="empty">ไม่พบรอบ</div></td></tr>';return}
   $('r-tbody').innerHTML=data.map(r=>{
     const io=r.opened&&!r.settled;
     const matchCnt=getRoundMatchCount(r);
@@ -1201,19 +1201,23 @@ function renderRoundsTable(){
       statusBadge='<span class="badge bgr">○ '+esc(st||'-')+'</span>';
     }
     const matchBadge=matchCnt>0
-      ?`<span style="display:inline-flex;align-items:center;gap:.3rem;font-family:'JetBrains Mono',monospace;font-weight:700;color:var(--blue);font-size:.82rem">${matchCnt}<span style="font-size:.62rem;color:var(--text2);font-family:'Sarabun',sans-serif;font-weight:400"> แผลสมบูรณ์</span></span>`
+      ?`<span style="display:inline-flex;align-items:center;gap:.3rem;background:var(--blue-dim);border:1px solid #00b4ff28;border-radius:999px;padding:.18rem .65rem;font-family:'JetBrains Mono',monospace;font-weight:800;color:var(--blue);font-size:.82rem">${matchCnt}<span style="font-size:.62rem;color:var(--text2);font-family:'Sarabun',sans-serif;font-weight:500;margin-left:.2rem">แผล</span></span>`
       :'<span style="color:var(--text3);font-size:.72rem">— ยังไม่มี</span>';
+    const priceBadge=priceDisp
+      ?`<span style="display:inline-flex;align-items:center;gap:.25rem;background:var(--orange-dim);border:1px solid #ff8c0028;border-radius:999px;padding:.15rem .6rem;font-family:'JetBrains Mono',monospace;font-weight:700;color:var(--orange);font-size:.78rem">${esc(priceDisp)}</span>`
+      :(io?'<span style="color:var(--text3);font-size:.72rem">⛔ รอช่าง</span>':'<span style="color:var(--text3);font-size:.72rem">—</span>');
     const resultCell=result
       ?`<span style="display:inline-flex;align-items:center;gap:.28rem;background:var(--neon-dim);border:1px solid var(--neon-border);border-radius:999px;padding:.15rem .6rem;font-family:'JetBrains Mono',monospace;font-weight:800;font-size:.82rem;color:var(--neon)">🎯 ${esc(result)}</span>`
-      :(priceDisp?`<span style="color:var(--text2);font-size:.72rem">ช่าง: ${esc(priceDisp)}</span>`:'<span style="color:var(--text3);font-size:.72rem">รอแจ้งผล</span>');
+      :'<span style="color:var(--text3);font-size:.72rem">รอแจ้งผล</span>';
     return`<tr>
       <td><div style="font-weight:700;font-size:.82rem">${esc(r.camp_name||r.base_no||'-')}</div><div class="mono" style="color:var(--text3);font-size:.63rem;margin-top:.1rem">ฐาน ${esc(r.base_no||'-')}</div></td>
       <td>${statusBadge}</td>
       <td>${matchBadge}</td>
+      <td>${priceBadge}</td>
       <td style="font-family:'JetBrains Mono',monospace;color:var(--yellow);font-weight:700">${fmt(totalAmt)}</td>
       <td>${resultCell}</td>
       <td style="font-size:.7rem;color:var(--text3)">${fmtD(r.opened_at||r.created_at)}</td>
-      <td><button class="abtn" onclick="openRoundDet('${esc(r.round_id||r.base_no)}','${esc(r.camp_name||r.base_no)}')">🔍 ดูคู่</button></td>
+      <td><button class="abtn" onclick="openRoundDet('${esc(r.round_id||r.base_no)}','${esc(r.camp_name||r.base_no)}')">🔍 ดู</button></td>
     </tr>`}).join('');
 }
 async function openRoundDet(rid,name){
