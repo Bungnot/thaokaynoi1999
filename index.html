@@ -823,7 +823,7 @@ body::before{background:radial-gradient(ellipse at 20% 8%,var(--neon-dim),transp
 </div>
 
 <div class="modal-bg" id="m-withdraw">
-  <div class="modal" style="width:440px">
+  <div class="modal" style="width:460px">
     <div class="mhdr" style="border-bottom:1px solid #f59e0b44">
       <h3 style="color:#f59e0b">💸 ยืนยันถอนเงิน</h3>
       <button class="mx" onclick="closeMod('m-withdraw')">&#x2715;</button>
@@ -838,13 +838,27 @@ body::before{background:radial-gradient(ellipse at 20% 8%,var(--neon-dim),transp
           <div style="font-family:'JetBrains Mono',monospace;font-size:2rem;font-weight:900;color:#f59e0b" id="wd-credit">0</div>
         </div>
       </div>
-      <div style="background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:.75rem .85rem;font-size:.76rem;color:var(--text2);line-height:1.6">
+
+      <!-- ข้อมูลบัญชี (แสดงถ้ามี) -->
+      <div id="wd-bank-info" style="background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:.6rem .75rem;margin-bottom:.65rem;font-size:.76rem;display:none">
+        <div style="font-size:.62rem;color:var(--text2);margin-bottom:.25rem">🏦 บัญชีปลายทาง</div>
+        <div id="wd-bank-no" style="font-family:'JetBrains Mono',monospace;font-weight:700;color:var(--text)">—</div>
+        <div id="wd-bank-name" style="color:var(--text2);font-size:.72rem">—</div>
+      </div>
+
+      <div style="background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:.75rem .85rem;font-size:.76rem;color:var(--text2);line-height:1.6;margin-bottom:.65rem">
         <div style="font-weight:700;color:var(--text);margin-bottom:.35rem">ระบบจะทำการ:</div>
         <div>&#x2705; ลบเครดิตทั้งหมด &#x2192; <strong style="color:#f59e0b">0</strong></div>
         <div>&#x1F4E8; ส่งข้อความแจ้งลูกค้าทาง LINE ทันที</div>
-        <div style="margin-top:.45rem;padding:.5rem .65rem;background:var(--bg4);border-radius:8px;font-size:.72rem;color:var(--text);font-style:italic">
-          &#x1F4B0;&#x2705; ทำรายการถอนให้เสร็จเรียบร้อยครับ หมานๆนะครับพี่ &#x1F64F;
-        </div>
+        <div>&#x1F4E4; ส่งแจ้งเข้ากลุ่มหลังบ้านที่เลือก</div>
+      </div>
+
+      <!-- เลือกกลุ่มหลังบ้าน -->
+      <div>
+        <div style="font-size:.68rem;color:var(--text2);margin-bottom:.25rem">📤 ส่งแจ้งเข้ากลุ่มหลังบ้าน</div>
+        <select id="wd-bo-group" style="width:100%;padding:.38rem .6rem;background:var(--bg2);border:1px solid var(--border2);border-radius:var(--radius);color:var(--text);font-size:.76rem;cursor:pointer;outline:none">
+          <option value="">ส่งทุกกลุ่มหลังบ้าน (default)</option>
+        </select>
       </div>
     </div>
     <div class="mfoot">
@@ -1100,10 +1114,33 @@ function renderUsers(users){
 function renderPager(meta){if(!meta){$('u-pager').innerHTML='';return}const{page,pages,total,per_page}=meta;const s=((page-1)*per_page)+1,e=Math.min(page*per_page,total);$('u-pager').innerHTML=`<span style="color:var(--text2);font-size:.7rem">${s}–${e} จาก ${fmt(total)}</span><div class="pgr-sp"></div><button class="pbtn" onclick="uGo(${page-1})" ${page<=1?'disabled':''}>‹</button>${[...Array(Math.min(5,pages))].map((_,i)=>{const p=Math.max(1,Math.min(pages-4,page-2))+i;return p<=pages?`<button class="pbtn ${p===page?'active':''}" onclick="uGo(${p})">${p}</button>`:''}).join('')}<button class="pbtn" onclick="uGo(${page+1})" ${page>=pages?'disabled':''}>›</button>`}
 function uGo(p){uPage=p;loadUsers()}
 
+let _curUid='',_boGroups=[];
+
+async function loadBOGroups(){
+  if(_boGroups.length)return;
+  try{const d=await api('/dashboard/api/backoffice-groups');_boGroups=d.data||[];}catch{}
+}
+
 async function openUserDet(uid){
+  _curUid=uid;
   $('m-user-title').textContent='กำลังโหลด...';$('m-user-body').innerHTML='<div class="loading"><div class="spin"></div></div>';openMod('m-user');
-  try{const d=await api('/dashboard/api/users/'+encodeURIComponent(uid));const u=d.data;$('m-user-title').textContent=u.name||u.user_id;const ms=u.matches||[];
-    $('m-user-body').innerHTML=`<div style="display:grid;grid-template-columns:1fr 1fr;gap:.7rem;margin-bottom:.8rem">
+  await loadBOGroups();
+  try{
+    const [d,bankD]=await Promise.all([
+      api('/dashboard/api/users/'+encodeURIComponent(uid)),
+      api('/dashboard/api/users/'+encodeURIComponent(uid)+'/bank').catch(()=>({ok:false,data:{}}))
+    ]);
+    const u=d.data;$('m-user-title').textContent=u.name||u.user_id;const ms=u.matches||[];
+    const bankNo=(bankD.data||{}).bank_account_no||'';
+    const bankName=(bankD.data||{}).bank_name||'';
+
+    // dropdown กลุ่มหลังบ้าน
+    const boOpts=_boGroups.length
+      ?_boGroups.map((g,i)=>`<option value="${esc(g)}">กลุ่ม ${i+1}: ${esc(g.substring(0,16))}...</option>`).join('')
+      :'<option value="">ไม่พบกลุ่ม (กรุณาตั้ง BACKOFFICE_GROUP_ID)</option>';
+
+    $('m-user-body').innerHTML=`
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:.7rem;margin-bottom:.8rem">
       <div><div style="font-size:.65rem;color:var(--text2);margin-bottom:.18rem">User ID</div><div class="mono" style="font-size:.68rem;word-break:break-all;color:var(--blue)">${esc(u.user_id)}</div></div>
       <div><div style="font-size:.65rem;color:var(--text2);margin-bottom:.18rem">ชื่อ</div><div style="font-weight:600">${esc(u.name||'-')}</div></div>
       <div><div style="font-size:.65rem;color:var(--text2);margin-bottom:.18rem">เลขสมาชิก</div><div class="mono">#${u.member_no||'-'}</div></div>
@@ -1111,47 +1148,164 @@ async function openUserDet(uid){
       <div><div style="font-size:.65rem;color:var(--text2);margin-bottom:.18rem">ใช้งานล่าสุด</div><div style="font-size:.76rem">${fmtD(u.last_seen_at)}</div></div>
       <div><div style="font-size:.65rem;color:var(--text2);margin-bottom:.18rem">สมัครเมื่อ</div><div style="font-size:.76rem">${fmtD(u.created_at)}</div></div>
     </div>
+
+    <!-- ========== ข้อมูลบัญชีธนาคาร ========== -->
+    <div style="background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius2);padding:.75rem .85rem;margin-bottom:.75rem">
+      <div style="font-size:.7rem;font-weight:700;color:var(--orange);margin-bottom:.5rem;display:flex;align-items:center;gap:.3rem">🏦 บัญชีธนาคารลูกค้า</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:.45rem;margin-bottom:.5rem">
+        <div>
+          <div style="font-size:.62rem;color:var(--text2);margin-bottom:.2rem">เลขบัญชี</div>
+          <input type="text" id="ud-bank-no" value="${esc(bankNo)}" placeholder="เช่น 074-844-1328"
+            style="width:100%;padding:.36rem .58rem;background:var(--bg2);border:1px solid var(--border2);border-radius:var(--radius);color:var(--text);font-family:'JetBrains Mono',monospace;font-size:.8rem;outline:none">
+        </div>
+        <div>
+          <div style="font-size:.62rem;color:var(--text2);margin-bottom:.2rem">ธนาคาร</div>
+          <input type="text" id="ud-bank-name" value="${esc(bankName)}" placeholder="เช่น กสิกรไทย, SCB"
+            style="width:100%;padding:.36rem .58rem;background:var(--bg2);border:1px solid var(--border2);border-radius:var(--radius);color:var(--text);font-family:'Sarabun',sans-serif;font-size:.8rem;outline:none">
+        </div>
+      </div>
+      <button class="btn bor" style="width:100%;justify-content:center;font-size:.75rem" onclick="saveUserBank('${esc(uid)}')">💾 บันทึกข้อมูลบัญชี</button>
+    </div>
+
+    <!-- ========== ส่งข้อความหลังบ้าน ========== -->
+    <div style="background:rgba(245,158,11,.08);border:1px solid #f59e0b44;border-radius:var(--radius2);padding:.75rem .85rem;margin-bottom:.75rem">
+      <div style="font-size:.7rem;font-weight:700;color:#f59e0b;margin-bottom:.5rem">📤 ส่งแจ้งถอนเข้าหลังบ้าน</div>
+      <div style="font-size:.7rem;color:var(--text2);margin-bottom:.45rem">ข้อความที่จะส่ง:</div>
+      <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:.55rem .7rem;font-family:'JetBrains Mono',monospace;font-size:.72rem;color:var(--text);white-space:pre;line-height:1.7;margin-bottom:.5rem" id="ud-preview-msg">[ถอนหลังบ้าน]
+ชื่อ: ${esc(u.name||'-')}  (#${u.member_no||'-'})
+${bankNo||'(ยังไม่ได้กรอกเลขบัญชี)'}
+${bankName||''}
+ยอด = ${fmt(u.credit||0)}</div>
+      <div style="margin-bottom:.45rem">
+        <div style="font-size:.62rem;color:var(--text2);margin-bottom:.2rem">ส่งไปกลุ่ม</div>
+        <select id="ud-bo-group" style="width:100%;padding:.36rem .58rem;background:var(--bg2);border:1px solid var(--border2);border-radius:var(--radius);color:var(--text);font-size:.76rem;cursor:pointer;outline:none">
+          <option value="">ส่งทุกกลุ่มหลังบ้าน</option>
+          ${boOpts}
+        </select>
+      </div>
+      <button class="btn" id="ud-send-bo-btn"
+        style="width:100%;justify-content:center;background:#f59e0b18;border-color:#f59e0b55;color:#f59e0b;font-size:.75rem"
+        onclick="sendToBackoffice('${esc(uid)}','${esc(u.name||'')}',${u.credit||0},'${u.member_no||'-'}')">
+        📨 ส่งข้อความหลังบ้าน
+      </button>
+    </div>
+
+    <!-- ========== ประวัติการแทง ========== -->
     <div style="font-size:.7rem;font-weight:700;color:var(--text2);margin-bottom:.45rem;padding-bottom:.35rem;border-bottom:1px solid var(--border)">ประวัติการแทง (20 ล่าสุด)</div>
     ${ms.length?`<table class="mtbl"><tr><th>รอบ</th><th>ค่าย</th><th>ฝั่ง</th><th>จำนวน</th><th>สถานะ</th></tr>${ms.map(m=>`<tr><td class="mono">${(m.round_id||'-').substring(0,8)}...</td><td>${esc(m.camp_name||'-')}</td><td>${m.side==='maker'?'<span class="badge bb_">maker</span>':'<span class="badge bp_">taker</span>'}</td><td style="font-family:'JetBrains Mono',monospace;color:var(--yellow)">${fmt(m.amount)}</td><td>${sbadge(m.status)}</td></tr>`).join('')}</table>`:'<div class="empty" style="padding:.85rem">ไม่มีประวัติ</div>'}
+
+    <!-- ========== ปรับเครดิตด่วน ========== -->
     <div style="font-size:.7rem;font-weight:700;color:var(--text2);margin-top:.8rem;margin-bottom:.4rem">ปรับเครดิตด่วน</div>
     <div class="cred-row"><input type="number" id="qc-amt" placeholder="+500 / -100"><button class="btn bng" onclick="qCredit('${esc(uid)}',false)">ปรับ (+/-)</button><button class="btn bgh" onclick="qCredit('${esc(uid)}',true)">ตั้งค่า (=)</button></div>`;
   }catch(e){$('m-user-body').innerHTML='<div class="empty">โหลดไม่ได้: '+e.message+'</div>'}
+}
+
+async function saveUserBank(uid){
+  const no=($('ud-bank-no')?.value||'').trim();
+  const name=($('ud-bank-name')?.value||'').trim();
+  try{
+    const r=await api('/dashboard/api/users/'+encodeURIComponent(uid)+'/bank',{method:'POST',body:JSON.stringify({bank_account_no:no,bank_name:name})});
+    if(r.ok){
+      toast('💾 บันทึกข้อมูลบัญชีสำเร็จ','success');
+      // อัปเดต preview
+      const preview=$('ud-preview-msg');
+      if(preview){
+        const lines=preview.textContent.split('\n');
+        if(lines.length>=3){lines[2]=no||'(ยังไม่ได้กรอกเลขบัญชี)';lines[3]=name||'';preview.textContent=lines.join('\n');}
+      }
+    }else toast(r.error||'บันทึกไม่ได้','error');
+  }catch(e){toast(e.message,'error')}
+}
+
+async function sendToBackoffice(uid,name,credit,memberNo){
+  const bankNo=($('ud-bank-no')?.value||'').trim();
+  const bankName=($('ud-bank-name')?.value||'').trim();
+  const groupId=($('ud-bo-group')?.value||'').trim();
+  const btn=$('ud-send-bo-btn');
+  if(btn){btn.disabled=true;btn.textContent='⏳ กำลังส่ง...';}
+  try{
+    // บันทึกบัญชีก่อนถ้ากรอกไว้
+    if(bankNo||bankName){
+      await api('/dashboard/api/users/'+encodeURIComponent(uid)+'/bank',{method:'POST',body:JSON.stringify({bank_account_no:bankNo,bank_name:bankName})}).catch(()=>{});
+    }
+    const body={notify_user:false};
+    if(groupId)body.backoffice_group_id=groupId;
+    const r=await api('/dashboard/api/users/'+encodeURIComponent(uid)+'/withdraw',{method:'POST',body:JSON.stringify(body)});
+    if(r.ok){
+      const sent=r.data?.backoffice_sent||0;
+      toast(`📨 ส่งหลังบ้านสำเร็จ ${sent} กลุ่ม`,'success');
+      // reload เพื่ออัปเดตเครดิต
+      setTimeout(()=>{openUserDet(uid);loadUsers();},500);
+    }else toast(r.error||'ส่งไม่ได้','error');
+  }catch(e){
+    if(e.message.includes('404'))toast('⚠️ กรุณาเพิ่ม routes ในไฟล์ เพิ่มท้าย_app.py.txt ก่อน','warning');
+    else toast(e.message,'error');
+  }finally{if(btn){btn.disabled=false;btn.innerHTML='📨 ส่งข้อความหลังบ้าน';}}
 }
 async function qCredit(uid,set){const amt=parseInt($('qc-amt').value);if(isNaN(amt))return;const path=set?`/dashboard/api/users/${encodeURIComponent(uid)}/credit/set`:`/dashboard/api/users/${encodeURIComponent(uid)}/credit`;try{const r=await api(path,{method:'POST',body:JSON.stringify({amount:amt,reason:'dashboard_quick'})});if(r.ok){toast('เครดิต: '+fmt(r.data.old_credit)+' → '+fmt(r.data.new_credit),'success');openUserDet(uid);loadUsers()}else toast(r.error||'ผิดพลาด','error')}catch(e){toast(e.message,'error')}}
 function openCreditModal(uid='',name=''){$('c-uid').value=uid;$('m-credit-title').textContent='ปรับเครดิต'+(name?' : '+name:'');$('c-amt').value='';$('c-reason').value='';openMod('m-credit')}
 async function submitCredit(){const uid=$('c-uid').value.trim(),amt=parseInt($('c-amt').value),reason=($('c-reason').value||'admin_dashboard').trim(),type=$('c-type').value;if(!uid){toast('ใส่ User ID ด้วย','error');return}if(isNaN(amt)){toast('ใส่จำนวนเครดิต','error');return}try{const path=type==='set'?`/dashboard/api/users/${encodeURIComponent(uid)}/credit/set`:`/dashboard/api/users/${encodeURIComponent(uid)}/credit`;const r=await api(path,{method:'POST',body:JSON.stringify({amount:amt,reason})});if(r.ok){toast('บันทึกสำเร็จ','success');closeMod('m-credit');loadUsers()}else toast(r.error||'ผิดพลาด','error')}catch(e){toast(e.message,'error')}}
 let wdPending={uid:'',name:'',credit:0};
 function confirmWithdrawFromBtn(btn){
-  // อ่านค่าจาก data-* เพื่อหลีกเลี่ยง SyntaxError จากชื่อที่มีอักขระพิเศษ
   const uid=btn.getAttribute('data-uid')||'';
   const name=btn.getAttribute('data-name')||uid;
   const credit=parseInt(btn.getAttribute('data-credit')||'0')||0;
   confirmWithdraw(uid,name,credit);
 }
-function confirmWithdraw(uid,name,credit){
+async function confirmWithdraw(uid,name,credit){
   if(credit<=0){toast('ไม่มีเครดิตให้ถอน','info');return}
   wdPending={uid,name,credit};
   $('wd-name').textContent=name||uid;
   $('wd-uid').textContent=(uid||'').substring(0,24)+'...';
   $('wd-credit').textContent=fmt(credit);
+  // โหลดข้อมูลบัญชี
+  try{
+    const b=await api('/dashboard/api/users/'+encodeURIComponent(uid)+'/bank');
+    const bno=(b.data||{}).bank_account_no||'';
+    const bname=(b.data||{}).bank_name||'';
+    const info=$('wd-bank-info');
+    if(bno||bname){
+      $('wd-bank-no').textContent=bno||'-';
+      $('wd-bank-name').textContent=bname||'-';
+      if(info)info.style.display='block';
+    }else{if(info)info.style.display='none';}
+  }catch{}
+  // โหลดกลุ่มหลังบ้าน
+  await loadBOGroups();
+  const sel=$('wd-bo-group');
+  if(sel){
+    sel.innerHTML='<option value="">ส่งทุกกลุ่มหลังบ้าน (default)</option>';
+    _boGroups.forEach((g,i)=>{
+      const o=document.createElement('option');
+      o.value=g;o.textContent=`กลุ่ม ${i+1}: ${g.substring(0,18)}...`;
+      sel.appendChild(o);
+    });
+  }
   openMod('m-withdraw');
 }
 async function execWithdraw(){
   const{uid,name,credit}=wdPending;
   if(!uid)return;
   const btn=$('wd-confirm-btn');
+  const groupId=($('wd-bo-group')?.value||'').trim();
   btn.disabled=true;btn.textContent='⏳ กำลังดำเนินการ...';
   try{
-    const r=await api('/dashboard/api/users/'+encodeURIComponent(uid)+'/withdraw',{method:'POST'});
+    const body={notify_user:true};
+    if(groupId)body.backoffice_group_id=groupId;
+    const r=await api('/dashboard/api/users/'+encodeURIComponent(uid)+'/withdraw',{method:'POST',body:JSON.stringify(body)});
     if(r.ok){
       closeMod('m-withdraw');
       const pushOk=r.data?.push_sent;
-      toast('✅ ถอนเงินสำเร็จ! เครดิต '+fmt(credit)+' → 0'+(pushOk?' · ส่ง LINE แล้ว':' · ⚠️ ส่ง LINE ไม่ได้'),'success');
+      const boSent=r.data?.backoffice_sent||0;
+      toast('✅ ถอนเงินสำเร็จ! เครดิต '+fmt(credit)+' → 0'+(pushOk?' · ส่ง LINE แล้ว':' · ⚠️ ส่ง LINE ไม่ได้')+(boSent?` · หลังบ้าน ${boSent} กลุ่ม`:''),'success');
       loadUsers();
     }else{
       toast(r.error||'เกิดข้อผิดพลาด','error');
     }
-  }catch(e){toast(e.message,'error')}
+  }catch(e){
+    if(e.message.includes('404'))toast('⚠️ กรุณาเพิ่ม routes ในไฟล์ เพิ่มท้าย_app.py.txt ก่อน','warning');
+    else toast(e.message,'error');
+  }
   finally{btn.disabled=false;btn.innerHTML='&#x1F4B8; ยืนยันถอนเงิน';}
 }
 
