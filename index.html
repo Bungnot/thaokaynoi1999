@@ -1095,7 +1095,7 @@ function renderUsers(users){
     <td><span style="font-family:'JetBrains Mono',monospace;font-weight:700;color:${cc}">${fmt(cr)}</span></td>
     <td style="color:var(--text2)">#${u.member_no||'-'}</td><td style="color:var(--text3);font-size:.7rem">${fmtD(u.last_seen_at)}</td>
     <td>${cr>0?'<span class="badge bg_">● มีเครดิต</span>':'<span class="badge bgr">○ ไม่มี</span>'}</td>
-    <td><div style="display:flex;gap:.28rem;flex-wrap:wrap"><button class="abtn" onclick="openUserDet('${esc(u.user_id)}')">ดู</button><button class="abtn" onclick="openCreditModal('${esc(u.user_id)}','${esc(u.name||'')}')">เครดิต</button>${cr>0?`<button class=\"abtn abtn-withdraw\" onclick=\"confirmWithdraw('${esc(u.user_id)}','${esc(u.name||u.user_id)}',${cr})\" style=\"border-color:#f59e0b55;color:#f59e0b\">💸 ถอน</button>`:`<button class=\"abtn\" disabled style=\"opacity:.3;cursor:not-allowed\">💸 ถอน</button>`}<button class="abtn d" onclick="delUser('${esc(u.user_id)}','${esc(u.name||'')}',${cr})">ลบ</button></div></td></tr>`}).join('');
+    <td><div style="display:flex;gap:.28rem;flex-wrap:wrap"><button class="abtn" onclick="openUserDet('${esc(u.user_id)}')">ดู</button><button class="abtn" onclick="openCreditModal('${esc(u.user_id)}','${esc(u.name||'')}')">เครดิต</button>${cr>0?`<button class="abtn abtn-withdraw" data-uid="${esc(u.user_id)}" data-name="${esc(u.name||u.user_id).replace(/"/g,'&quot;')}" data-credit="${cr}" onclick="confirmWithdrawFromBtn(this)">💸 ถอน</button>`:'<button class="abtn" disabled style="opacity:.3;cursor:not-allowed">💸 ถอน</button>'}<button class="abtn d" onclick="delUser('${esc(u.user_id)}','${esc(u.name||'')}',${cr})">ลบ</button></div></td></tr>`}).join('');
 }
 function renderPager(meta){if(!meta){$('u-pager').innerHTML='';return}const{page,pages,total,per_page}=meta;const s=((page-1)*per_page)+1,e=Math.min(page*per_page,total);$('u-pager').innerHTML=`<span style="color:var(--text2);font-size:.7rem">${s}–${e} จาก ${fmt(total)}</span><div class="pgr-sp"></div><button class="pbtn" onclick="uGo(${page-1})" ${page<=1?'disabled':''}>‹</button>${[...Array(Math.min(5,pages))].map((_,i)=>{const p=Math.max(1,Math.min(pages-4,page-2))+i;return p<=pages?`<button class="pbtn ${p===page?'active':''}" onclick="uGo(${p})">${p}</button>`:''}).join('')}<button class="pbtn" onclick="uGo(${page+1})" ${page>=pages?'disabled':''}>›</button>`}
 function uGo(p){uPage=p;loadUsers()}
@@ -1121,6 +1121,13 @@ async function qCredit(uid,set){const amt=parseInt($('qc-amt').value);if(isNaN(a
 function openCreditModal(uid='',name=''){$('c-uid').value=uid;$('m-credit-title').textContent='ปรับเครดิต'+(name?' : '+name:'');$('c-amt').value='';$('c-reason').value='';openMod('m-credit')}
 async function submitCredit(){const uid=$('c-uid').value.trim(),amt=parseInt($('c-amt').value),reason=($('c-reason').value||'admin_dashboard').trim(),type=$('c-type').value;if(!uid){toast('ใส่ User ID ด้วย','error');return}if(isNaN(amt)){toast('ใส่จำนวนเครดิต','error');return}try{const path=type==='set'?`/dashboard/api/users/${encodeURIComponent(uid)}/credit/set`:`/dashboard/api/users/${encodeURIComponent(uid)}/credit`;const r=await api(path,{method:'POST',body:JSON.stringify({amount:amt,reason})});if(r.ok){toast('บันทึกสำเร็จ','success');closeMod('m-credit');loadUsers()}else toast(r.error||'ผิดพลาด','error')}catch(e){toast(e.message,'error')}}
 let wdPending={uid:'',name:'',credit:0};
+function confirmWithdrawFromBtn(btn){
+  // อ่านค่าจาก data-* เพื่อหลีกเลี่ยง SyntaxError จากชื่อที่มีอักขระพิเศษ
+  const uid=btn.getAttribute('data-uid')||'';
+  const name=btn.getAttribute('data-name')||uid;
+  const credit=parseInt(btn.getAttribute('data-credit')||'0')||0;
+  confirmWithdraw(uid,name,credit);
+}
 function confirmWithdraw(uid,name,credit){
   if(credit<=0){toast('ไม่มีเครดิตให้ถอน','info');return}
   wdPending={uid,name,credit};
