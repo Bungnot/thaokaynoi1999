@@ -1116,9 +1116,22 @@ function uGo(p){uPage=p;loadUsers()}
 
 let _curUid='',_boGroups=[];
 
-async function loadBOGroups(){
-  if(_boGroups.length)return;
-  try{const d=await api('/dashboard/api/backoffice-groups');_boGroups=d.data||[];}catch{}
+async function loadBOGroups(force=false){
+  if(_boGroups.length&&!force)return;
+  try{
+    const d=await api('/dashboard/api/backoffice-groups');
+    const raw=d.data||[];
+    _boGroups=raw.map((g,i)=>typeof g==='string'?{group_id:g,name:''}:g);
+  }catch{_boGroups=[];}
+}
+
+function boGroupLabel(g,i){
+  return g.name?g.name:'กลุ่ม '+(i+1)+' ('+(g.group_id||'').substring(0,10)+'...)';
+}
+
+function buildBoGroupOpts(){
+  if(!_boGroups.length)return '<option value="">ไม่พบกลุ่ม — กรุณาตั้ง BACKOFFICE_GROUP_ID</option>';
+  return _boGroups.map(function(g,i){return '<option value="'+g.group_id.replace(/"/g,'')+'">'+boGroupLabel(g,i)+'</option>';}).join('');
 }
 
 async function openUserDet(uid){
@@ -1133,11 +1146,6 @@ async function openUserDet(uid){
     const u=d.data;$('m-user-title').textContent=u.name||u.user_id;const ms=u.matches||[];
     const bankNo=(bankD.data||{}).bank_account_no||'';
     const bankName=(bankD.data||{}).bank_name||'';
-
-    // dropdown กลุ่มหลังบ้าน
-    const boOpts=_boGroups.length
-      ?_boGroups.map((g,i)=>`<option value="${esc(g)}">กลุ่ม ${i+1}: ${esc(g.substring(0,16))}...</option>`).join('')
-      :'<option value="">ไม่พบกลุ่ม (กรุณาตั้ง BACKOFFICE_GROUP_ID)</option>';
 
     $('m-user-body').innerHTML=`
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:.7rem;margin-bottom:.8rem">
@@ -1172,7 +1180,7 @@ async function openUserDet(uid){
       <div style="font-size:.7rem;font-weight:700;color:#f59e0b;margin-bottom:.5rem">📤 ส่งแจ้งถอนเข้าหลังบ้าน</div>
       <div style="font-size:.7rem;color:var(--text2);margin-bottom:.45rem">ข้อความที่จะส่ง:</div>
       <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:.55rem .7rem;font-family:'JetBrains Mono',monospace;font-size:.72rem;color:var(--text);white-space:pre;line-height:1.7;margin-bottom:.5rem" id="ud-preview-msg">[ถอนหลังบ้าน]
-ชื่อ: ${esc(u.name||'-')}  (#${u.member_no||'-'})
+ชื่อ: ${esc(u.name||'-')}
 ${bankNo||'(ยังไม่ได้กรอกเลขบัญชี)'}
 ${bankName||''}
 ยอด = ${fmt(u.credit||0)}</div>
@@ -1180,7 +1188,7 @@ ${bankName||''}
         <div style="font-size:.62rem;color:var(--text2);margin-bottom:.2rem">ส่งไปกลุ่ม</div>
         <select id="ud-bo-group" style="width:100%;padding:.36rem .58rem;background:var(--bg2);border:1px solid var(--border2);border-radius:var(--radius);color:var(--text);font-size:.76rem;cursor:pointer;outline:none">
           <option value="">ส่งทุกกลุ่มหลังบ้าน</option>
-          ${boOpts}
+          ${buildBoGroupOpts()}
         </select>
       </div>
       <button class="btn" id="ud-send-bo-btn"
@@ -1274,12 +1282,7 @@ async function confirmWithdraw(uid,name,credit){
   await loadBOGroups();
   const sel=$('wd-bo-group');
   if(sel){
-    sel.innerHTML='<option value="">ส่งทุกกลุ่มหลังบ้าน (default)</option>';
-    _boGroups.forEach((g,i)=>{
-      const o=document.createElement('option');
-      o.value=g;o.textContent=`กลุ่ม ${i+1}: ${g.substring(0,18)}...`;
-      sel.appendChild(o);
-    });
+    sel.innerHTML='<option value="">ส่งทุกกลุ่มหลังบ้าน</option>'+buildBoGroupOpts();
   }
   openMod('m-withdraw');
 }
