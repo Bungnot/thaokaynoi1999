@@ -853,6 +853,15 @@ body::before{background:radial-gradient(ellipse at 20% 8%,var(--neon-dim),transp
         <div>&#x1F4E4; ส่งแจ้งเข้ากลุ่มหลังบ้านที่เลือก</div>
       </div>
 
+      <!-- ชื่อเจ้าของบัญชี -->
+      <div style="margin-bottom:.65rem">
+        <div style="font-size:.68rem;color:var(--text2);margin-bottom:.25rem">👤 ชื่อเจ้าของบัญชีธนาคาร</div>
+        <input type="text" id="wd-owner-name" placeholder="กรอกชื่อเจ้าของบัญชี..."
+          style="width:100%;padding:.45rem .65rem;background:var(--bg2);border:1px solid #f59e0b55;border-radius:var(--radius);color:var(--text);font-family:'Sarabun',sans-serif;font-size:.82rem;outline:none;transition:border-color .2s,box-shadow .2s"
+          onfocus="this.style.borderColor='#f59e0b';this.style.boxShadow='0 0 0 2px #f59e0b18'"
+          onblur="this.style.borderColor='#f59e0b55';this.style.boxShadow='none'">
+      </div>
+
       <!-- เลือกกลุ่มหลังบ้าน -->
       <div>
         <div style="font-size:.68rem;color:var(--text2);margin-bottom:.25rem">📤 ส่งแจ้งเข้ากลุ่มหลังบ้าน</div>
@@ -1278,16 +1287,20 @@ async function confirmWithdraw(uid,name,credit){
   $('wd-uid').textContent=(uid||'').substring(0,24)+'...';
   $('wd-credit').textContent=fmt(credit);
   // โหลดข้อมูลบัญชี
+  const ownerInput=$('wd-owner-name');
+  if(ownerInput)ownerInput.value='';
   try{
     const b=await api('/dashboard/api/users/'+encodeURIComponent(uid)+'/bank');
     const bno=(b.data||{}).bank_account_no||'';
     const bname=(b.data||{}).bank_name||'';
+    const bowner=(b.data||{}).bank_owner_name||(b.data||{}).owner_name||'';
     const info=$('wd-bank-info');
     if(bno||bname){
       $('wd-bank-no').textContent=bno||'-';
       $('wd-bank-name').textContent=bname||'-';
       if(info)info.style.display='block';
     }else{if(info)info.style.display='none';}
+    if(ownerInput&&bowner)ownerInput.value=bowner;
   }catch{}
   // โหลดกลุ่มหลังบ้าน
   await loadBOGroups();
@@ -1302,10 +1315,16 @@ async function execWithdraw(){
   if(!uid)return;
   const btn=$('wd-confirm-btn');
   const groupId=($('wd-bo-group')?.value||'').trim();
+  const ownerName=($('wd-owner-name')?.value||'').trim();
   btn.disabled=true;btn.textContent='⏳ กำลังดำเนินการ...';
+  // บันทึกชื่อเจ้าของบัญชีถ้ากรอกไว้
+  if(ownerName){
+    await api('/dashboard/api/users/'+encodeURIComponent(uid)+'/bank',{method:'POST',body:JSON.stringify({bank_owner_name:ownerName})}).catch(()=>{});
+  }
   try{
     const body={notify_user:true};
     if(groupId)body.backoffice_group_id=groupId;
+    if(ownerName)body.bank_owner_name=ownerName;
     const r=await api('/dashboard/api/users/'+encodeURIComponent(uid)+'/withdraw',{method:'POST',body:JSON.stringify(body)});
     if(r.ok){
       closeMod('m-withdraw');
