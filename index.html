@@ -1,4 +1,4 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="th">
 <head>
 <meta charset="UTF-8">
@@ -1175,17 +1175,20 @@ async function openUserDet(uid){
       <div style="margin-bottom:.45rem">
         <div style="font-size:.62rem;color:var(--text2);margin-bottom:.2rem">ชื่อเจ้าของบัญชี</div>
         <input type="text" id="ud-bank-owner" value="${esc(bankOwner)}" placeholder="เช่น สมชาย ใจดี"
+          oninput="updateWdPreview()"
           style="width:100%;padding:.36rem .58rem;background:var(--bg2);border:1px solid var(--border2);border-radius:var(--radius);color:var(--text);font-family:'Sarabun',sans-serif;font-size:.8rem;outline:none">
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:.45rem;margin-bottom:.5rem">
         <div>
           <div style="font-size:.62rem;color:var(--text2);margin-bottom:.2rem">เลขบัญชี</div>
           <input type="text" id="ud-bank-no" value="${esc(bankNo)}" placeholder="เช่น 074-844-1328"
+            oninput="updateWdPreview()"
             style="width:100%;padding:.36rem .58rem;background:var(--bg2);border:1px solid var(--border2);border-radius:var(--radius);color:var(--text);font-family:'JetBrains Mono',monospace;font-size:.8rem;outline:none">
         </div>
         <div>
           <div style="font-size:.62rem;color:var(--text2);margin-bottom:.2rem">ธนาคาร</div>
           <input type="text" id="ud-bank-name" value="${esc(bankName)}" placeholder="เช่น กสิกรไทย, SCB"
+            oninput="updateWdPreview()"
             style="width:100%;padding:.36rem .58rem;background:var(--bg2);border:1px solid var(--border2);border-radius:var(--radius);color:var(--text);font-family:'Sarabun',sans-serif;font-size:.8rem;outline:none">
         </div>
       </div>
@@ -1196,7 +1199,7 @@ async function openUserDet(uid){
     <div style="background:rgba(245,158,11,.08);border:1px solid #f59e0b44;border-radius:var(--radius2);padding:.75rem .85rem;margin-bottom:.75rem">
       <div style="font-size:.7rem;font-weight:700;color:#f59e0b;margin-bottom:.5rem">📤 ส่งแจ้งถอนเข้าหลังบ้าน</div>
       <div style="font-size:.7rem;color:var(--text2);margin-bottom:.45rem">ข้อความที่จะส่ง:</div>
-      <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:.55rem .7rem;font-family:'JetBrains Mono',monospace;font-size:.72rem;color:var(--text);white-space:pre;line-height:1.7;margin-bottom:.5rem" id="ud-preview-msg">[ถอนหลังบ้าน]
+      <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:.55rem .7rem;font-family:'JetBrains Mono',monospace;font-size:.72rem;color:var(--text);white-space:pre;line-height:1.7;margin-bottom:.5rem" id="ud-preview-msg" data-line-name="${esc(u.name||'-')}" data-credit="${fmt(u.credit||0)}">[ถอนหลังบ้าน]
 
 ชื่อ: ${bankOwner||esc(u.name||'-')}
  ${bankNo||'(ยังไม่ได้กรอกเลขบัญชี)'} 
@@ -1227,12 +1230,21 @@ ${bankName||''}
   }catch(e){$('m-user-body').innerHTML='<div class="empty">โหลดไม่ได้: '+e.message+'</div>'}
 }
 
+function updateWdPreview(){
+  const preview=$('ud-preview-msg');
+  if(!preview)return;
+  const owner=($('ud-bank-owner')?.value||'').trim();
+  const no=($('ud-bank-no')?.value||'').trim();
+  const nm=($('ud-bank-name')?.value||'').trim();
+  const nameDisp=owner||preview.dataset.lineName||'-';
+  const credit=preview.dataset.credit||'0';
+  preview.textContent='[ถอนหลังบ้าน]\n\nชื่อ: '+nameDisp+'\n '+( no||'(ยังไม่ได้กรอกเลขบัญชี)')+' \n'+(nm||'')+'\n\n ยอด = '+credit;
+}
 async function saveUserBank(uid){
   const no=($('ud-bank-no')?.value||'').trim();
   const name=($('ud-bank-name')?.value||'').trim();
   try{
-    const owner=($('ud-bank-owner')?.value||'').trim();
-    const r=await api('/dashboard/api/users/'+encodeURIComponent(uid)+'/bank',{method:'POST',body:JSON.stringify({bank_account_no:no,bank_name:name,bank_owner_name:owner})});
+    const r=await api('/dashboard/api/users/'+encodeURIComponent(uid)+'/bank',{method:'POST',body:JSON.stringify({bank_account_no:no,bank_name:name})});
     if(r.ok){
       toast('💾 บันทึกข้อมูลบัญชีสำเร็จ','success');
       // อัปเดต preview
@@ -1248,7 +1260,6 @@ async function saveUserBank(uid){
 async function sendToBackoffice(uid,name,credit,memberNo){
   const bankNo=($('ud-bank-no')?.value||'').trim();
   const bankName=($('ud-bank-name')?.value||'').trim();
-  const bankOwner2=($('ud-bank-owner')?.value||'').trim();
   const groupId=($('ud-bo-group')?.value||'').trim();
   const btn=$('ud-send-bo-btn');
   if(btn){btn.disabled=true;btn.textContent='⏳ กำลังส่ง...';}
