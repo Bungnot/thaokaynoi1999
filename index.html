@@ -853,15 +853,6 @@ body::before{background:radial-gradient(ellipse at 20% 8%,var(--neon-dim),transp
         <div>&#x1F4E4; ส่งแจ้งเข้ากลุ่มหลังบ้านที่เลือก</div>
       </div>
 
-      <!-- ชื่อเจ้าของบัญชี -->
-      <div style="margin-bottom:.65rem">
-        <div style="font-size:.68rem;color:var(--text2);margin-bottom:.25rem">👤 ชื่อเจ้าของบัญชีธนาคาร</div>
-        <input type="text" id="wd-owner-name" placeholder="กรอกชื่อเจ้าของบัญชี..."
-          style="width:100%;padding:.45rem .65rem;background:var(--bg2);border:1px solid #f59e0b55;border-radius:var(--radius);color:var(--text);font-family:'Sarabun',sans-serif;font-size:.82rem;outline:none;transition:border-color .2s,box-shadow .2s"
-          onfocus="this.style.borderColor='#f59e0b';this.style.boxShadow='0 0 0 2px #f59e0b18'"
-          onblur="this.style.borderColor='#f59e0b55';this.style.boxShadow='none'">
-      </div>
-
       <!-- เลือกกลุ่มหลังบ้าน -->
       <div>
         <div style="font-size:.68rem;color:var(--text2);margin-bottom:.25rem">📤 ส่งแจ้งเข้ากลุ่มหลังบ้าน</div>
@@ -1166,6 +1157,7 @@ async function openUserDet(uid){
     const u=d.data;$('m-user-title').textContent=u.name||u.user_id;const ms=u.matches||[];
     const bankNo=(bankD.data||{}).bank_account_no||'';
     const bankName=(bankD.data||{}).bank_name||'';
+    const bankOwner=(bankD.data||{}).bank_owner_name||(bankD.data||{}).owner_name||'';
 
     $('m-user-body').innerHTML=`
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:.7rem;margin-bottom:.8rem">
@@ -1180,6 +1172,11 @@ async function openUserDet(uid){
     <!-- ========== ข้อมูลบัญชีธนาคาร ========== -->
     <div style="background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius2);padding:.75rem .85rem;margin-bottom:.75rem">
       <div style="font-size:.7rem;font-weight:700;color:var(--orange);margin-bottom:.5rem;display:flex;align-items:center;gap:.3rem">🏦 บัญชีธนาคารลูกค้า</div>
+      <div style="margin-bottom:.45rem">
+        <div style="font-size:.62rem;color:var(--text2);margin-bottom:.2rem">ชื่อเจ้าของบัญชี</div>
+        <input type="text" id="ud-bank-owner" value="${esc(bankOwner)}" placeholder="เช่น สมชาย ใจดี"
+          style="width:100%;padding:.36rem .58rem;background:var(--bg2);border:1px solid var(--border2);border-radius:var(--radius);color:var(--text);font-family:'Sarabun',sans-serif;font-size:.8rem;outline:none">
+      </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:.45rem;margin-bottom:.5rem">
         <div>
           <div style="font-size:.62rem;color:var(--text2);margin-bottom:.2rem">เลขบัญชี</div>
@@ -1201,6 +1198,7 @@ async function openUserDet(uid){
       <div style="font-size:.7rem;color:var(--text2);margin-bottom:.45rem">ข้อความที่จะส่ง:</div>
       <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:.55rem .7rem;font-family:'JetBrains Mono',monospace;font-size:.72rem;color:var(--text);white-space:pre;line-height:1.7;margin-bottom:.5rem" id="ud-preview-msg">[ถอนหลังบ้าน]
 ชื่อ: ${esc(u.name||'-')}
+ชื่อบัญชี: ${bankOwner||('(ยังไม่ได้กรอก)')}
 ${bankNo||'(ยังไม่ได้กรอกเลขบัญชี)'}
 ${bankName||''}
 ยอด = ${fmt(u.credit||0)}</div>
@@ -1231,8 +1229,9 @@ ${bankName||''}
 async function saveUserBank(uid){
   const no=($('ud-bank-no')?.value||'').trim();
   const name=($('ud-bank-name')?.value||'').trim();
+  const owner=($('ud-bank-owner')?.value||'').trim();
   try{
-    const r=await api('/dashboard/api/users/'+encodeURIComponent(uid)+'/bank',{method:'POST',body:JSON.stringify({bank_account_no:no,bank_name:name})});
+    const r=await api('/dashboard/api/users/'+encodeURIComponent(uid)+'/bank',{method:'POST',body:JSON.stringify({bank_account_no:no,bank_name:name,bank_owner_name:owner})});
     if(r.ok){
       toast('💾 บันทึกข้อมูลบัญชีสำเร็จ','success');
       // อัปเดต preview
@@ -1248,13 +1247,14 @@ async function saveUserBank(uid){
 async function sendToBackoffice(uid,name,credit,memberNo){
   const bankNo=($('ud-bank-no')?.value||'').trim();
   const bankName=($('ud-bank-name')?.value||'').trim();
+  const bankOwner=($('ud-bank-owner')?.value||'').trim();
   const groupId=($('ud-bo-group')?.value||'').trim();
   const btn=$('ud-send-bo-btn');
   if(btn){btn.disabled=true;btn.textContent='⏳ กำลังส่ง...';}
   try{
     // บันทึกบัญชีก่อนถ้ากรอกไว้
-    if(bankNo||bankName){
-      await api('/dashboard/api/users/'+encodeURIComponent(uid)+'/bank',{method:'POST',body:JSON.stringify({bank_account_no:bankNo,bank_name:bankName})}).catch(()=>{});
+    if(bankNo||bankName||bankOwner){
+      await api('/dashboard/api/users/'+encodeURIComponent(uid)+'/bank',{method:'POST',body:JSON.stringify({bank_account_no:bankNo,bank_name:bankName,bank_owner_name:bankOwner})}).catch(()=>{});
     }
     const body={notify_user:false};
     if(groupId)body.backoffice_group_id=groupId;
@@ -1287,20 +1287,16 @@ async function confirmWithdraw(uid,name,credit){
   $('wd-uid').textContent=(uid||'').substring(0,24)+'...';
   $('wd-credit').textContent=fmt(credit);
   // โหลดข้อมูลบัญชี
-  const ownerInput=$('wd-owner-name');
-  if(ownerInput)ownerInput.value='';
   try{
     const b=await api('/dashboard/api/users/'+encodeURIComponent(uid)+'/bank');
     const bno=(b.data||{}).bank_account_no||'';
     const bname=(b.data||{}).bank_name||'';
-    const bowner=(b.data||{}).bank_owner_name||(b.data||{}).owner_name||'';
     const info=$('wd-bank-info');
     if(bno||bname){
       $('wd-bank-no').textContent=bno||'-';
       $('wd-bank-name').textContent=bname||'-';
       if(info)info.style.display='block';
     }else{if(info)info.style.display='none';}
-    if(ownerInput&&bowner)ownerInput.value=bowner;
   }catch{}
   // โหลดกลุ่มหลังบ้าน
   await loadBOGroups();
@@ -1315,16 +1311,10 @@ async function execWithdraw(){
   if(!uid)return;
   const btn=$('wd-confirm-btn');
   const groupId=($('wd-bo-group')?.value||'').trim();
-  const ownerName=($('wd-owner-name')?.value||'').trim();
   btn.disabled=true;btn.textContent='⏳ กำลังดำเนินการ...';
-  // บันทึกชื่อเจ้าของบัญชีถ้ากรอกไว้
-  if(ownerName){
-    await api('/dashboard/api/users/'+encodeURIComponent(uid)+'/bank',{method:'POST',body:JSON.stringify({bank_owner_name:ownerName})}).catch(()=>{});
-  }
   try{
     const body={notify_user:true};
     if(groupId)body.backoffice_group_id=groupId;
-    if(ownerName)body.bank_owner_name=ownerName;
     const r=await api('/dashboard/api/users/'+encodeURIComponent(uid)+'/withdraw',{method:'POST',body:JSON.stringify(body)});
     if(r.ok){
       closeMod('m-withdraw');
