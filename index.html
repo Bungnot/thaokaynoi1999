@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="th">
 <head>
 <meta charset="UTF-8">
@@ -1197,11 +1197,12 @@ async function openUserDet(uid){
       <div style="font-size:.7rem;font-weight:700;color:#f59e0b;margin-bottom:.5rem">📤 ส่งแจ้งถอนเข้าหลังบ้าน</div>
       <div style="font-size:.7rem;color:var(--text2);margin-bottom:.45rem">ข้อความที่จะส่ง:</div>
       <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:.55rem .7rem;font-family:'JetBrains Mono',monospace;font-size:.72rem;color:var(--text);white-space:pre;line-height:1.7;margin-bottom:.5rem" id="ud-preview-msg">[ถอนหลังบ้าน]
-ชื่อ: ${esc(u.name||'-')}
-ชื่อบัญชี: ${bankOwner||('(ยังไม่ได้กรอก)')}
-${bankNo||'(ยังไม่ได้กรอกเลขบัญชี)'}
+
+ชื่อ: ${bankOwner||esc(u.name||'-')}
+ ${bankNo||'(ยังไม่ได้กรอกเลขบัญชี)'} 
 ${bankName||''}
-ยอด = ${fmt(u.credit||0)}</div>
+
+ ยอด = ${fmt(u.credit||0)}</div>
       <div style="margin-bottom:.45rem">
         <div style="font-size:.62rem;color:var(--text2);margin-bottom:.2rem">ส่งไปกลุ่ม</div>
         <select id="ud-bo-group" style="width:100%;padding:.36rem .58rem;background:var(--bg2);border:1px solid var(--border2);border-radius:var(--radius);color:var(--text);font-size:.76rem;cursor:pointer;outline:none">
@@ -1229,8 +1230,8 @@ ${bankName||''}
 async function saveUserBank(uid){
   const no=($('ud-bank-no')?.value||'').trim();
   const name=($('ud-bank-name')?.value||'').trim();
-  const owner=($('ud-bank-owner')?.value||'').trim();
   try{
+    const owner=($('ud-bank-owner')?.value||'').trim();
     const r=await api('/dashboard/api/users/'+encodeURIComponent(uid)+'/bank',{method:'POST',body:JSON.stringify({bank_account_no:no,bank_name:name,bank_owner_name:owner})});
     if(r.ok){
       toast('💾 บันทึกข้อมูลบัญชีสำเร็จ','success');
@@ -1247,14 +1248,14 @@ async function saveUserBank(uid){
 async function sendToBackoffice(uid,name,credit,memberNo){
   const bankNo=($('ud-bank-no')?.value||'').trim();
   const bankName=($('ud-bank-name')?.value||'').trim();
-  const bankOwner=($('ud-bank-owner')?.value||'').trim();
+  const bankOwner2=($('ud-bank-owner')?.value||'').trim();
   const groupId=($('ud-bo-group')?.value||'').trim();
   const btn=$('ud-send-bo-btn');
   if(btn){btn.disabled=true;btn.textContent='⏳ กำลังส่ง...';}
   try{
     // บันทึกบัญชีก่อนถ้ากรอกไว้
-    if(bankNo||bankName||bankOwner){
-      await api('/dashboard/api/users/'+encodeURIComponent(uid)+'/bank',{method:'POST',body:JSON.stringify({bank_account_no:bankNo,bank_name:bankName,bank_owner_name:bankOwner})}).catch(()=>{});
+    if(bankNo||bankName){
+      await api('/dashboard/api/users/'+encodeURIComponent(uid)+'/bank',{method:'POST',body:JSON.stringify({bank_account_no:bankNo,bank_name:bankName})}).catch(()=>{});
     }
     const body={notify_user:false};
     if(groupId)body.backoffice_group_id=groupId;
